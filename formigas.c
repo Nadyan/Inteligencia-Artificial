@@ -42,7 +42,7 @@ int main(){
         usleep(1000*80); // 80ms
         limpaTela();        
         realizaMovimento();
-        printf("interacao n: %d\n", i);
+        printf("interacao n: %d\n", i+1);
     }
 
 
