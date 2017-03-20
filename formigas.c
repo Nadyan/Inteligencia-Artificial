@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-#define TAM 50
+#define TAM 51 //raio = n-1
 #define RAIO 5
 
 //fazer experimentos com raios 1, 5 e 10
@@ -41,9 +42,9 @@ int main(){
     
     formigasVivas = iniciaCenario();
 
-    for(i = 1; i < 500; i++){
+    for(i = 1; i < 100; i++){
         imprimeCenario();
-        usleep(1000*80) // 80ms
+        usleep(1000*80); // 80ms
         limpaTela();        
         realizaMovimento();
         printf("interacao n: %d\n", i);
@@ -60,8 +61,8 @@ int iniciaCenario(){
 
     srand((unsigned)time(NULL));
 
-    for(i = 0; i < TAM; i++){
-        for(j = 0; j < TAM; j++){
+    for(i = 1; i < TAM-1; i++){
+        for(j = 1; j < TAM-1; j++){
 
             chance = rand() % 100;
 
