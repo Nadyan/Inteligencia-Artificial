@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define TAM 51 //raio = n-1
+#define TAM 51 //tam = n-1
 #define RAIO 5
 
 //fazer experimentos com raios 1, 5 e 10
