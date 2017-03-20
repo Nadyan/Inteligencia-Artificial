@@ -24,11 +24,6 @@ int mortas[TAM][TAM]; // 0 = nada, 1 = formiga morta
 int espacoVazio[TAM][TAM]; // 0 = nada, 1 = espaco vazio
 
 
-/*typedef struct formiga{
-    int status; // 1 para carregando, 0 para vazia  
-};*/
-
-
 int main(){
 
     int i, j, formigasVivas;
