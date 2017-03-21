@@ -120,23 +120,31 @@ void realizaMovimento(){
                 // procura formigas mortas nas celulas adjacentes e se encontrar, chama decideSePega()
                 if(mortas[i-1][j] == 1){ // se esta no norte
                     decisao = decideSePega(i-1, j);
-                    if(decisao == 1)
+                    if(decisao == 1){
                         vivas[i][j] = 2; // formiga passou a estar carregando
+                        mortas[i-1][j] = 0; // remove a morta                    
+                    }                
                 }
                 else if(mortas[i+1][j] == 1){ // se esta no sul
                     decisao = decideSePega(i+1, j);
-                    if(decisao == 1)
+                    if(decisao == 1){
                         vivas[i][j] = 2;
+                        mortas[i+1][j] = 0;
+                    }
                 }
                 else if(mortas[i][j+1] == 1){ // se esta no leste
                     decisao = decideSePega(i, j+1);
-                    if(decisao == 1)
+                    if(decisao == 1){
                         vivas[i][j] = 2;
+                        mortas[i][j+1] = 0;
+                    }
                 }
                 else if(mortas[i][j-1] == 1){ // se esta no oeste
                     decisao = decideSePega(i, j-1);
-                    if(decisao == 1)
+                    if(decisao == 1){
                         vivas[i][j] = 2;
+                        mortas[i][j-1] = 0;
+                    }
                 }
             }
             if(vivas[i][j] == 2){ // se a formiga em i j estiver carregando
@@ -171,23 +179,31 @@ void realizaMovimento(){
                 // procura formigas mortas nas celulas adjacentes e se encontrar, chama decideSeLarga()
                 if(mortas[i-1][j] == 1){ // se esta no norte
                     decisao = decideSeLarga(i-1, j);
-                    if(decisao == 1)
+                    if(decisao == 1){
                         vivas[i][j] = 1; // formiga passou a estar carregando
+                        mortas[i][j] = 1; // larga a morta onde esta
+                    }
                 }
                 else if(mortas[i+1][j] == 1){ // se esta no sul
                     decisao = decideSeLarga(i+1, j);
-                    if(decisao == 1)
+                    if(decisao == 1){
                         vivas[i][j] = 1;
+                        mortas[i][j] = 1;
+                    }
                 }
                 else if(mortas[i][j+1] == 1){ // se esta no leste
                     decisao = decideSeLarga(i, j+1);
-                    if(decisao == 1)
+                    if(decisao == 1){
                         vivas[i][j] = 1;
+                        mortas[i][j] = 1;
+                    }
                 }
                 else if(mortas[i][j-1] == 1){ // se esta no oeste
                     decisao = decideSeLarga(i, j-1);
-                    if(decisao == 1)
+                    if(decisao == 1){
                         vivas[i][j] = 1;
+                        mortas[i][j] = 1;
+                    }
                 }
             }
         }
