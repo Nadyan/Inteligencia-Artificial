@@ -38,7 +38,7 @@ int main(){
     formigasVivas = 0;
     formigasMortas = 0;
 
-    for(i = 1; i < 250; i++){ // 1500 interacoes
+    for(i = 1; i < 1500; i++){ // 1500 interacoes
         imprimeCenario();
         usleep(1000*80); // 80ms
         limpaTela();        
