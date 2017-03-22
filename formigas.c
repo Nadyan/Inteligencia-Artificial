@@ -12,8 +12,8 @@ int iniciaCenario();
 void imprimeCenario();
 void realizaMovimento();
 void limpaTela();
-int decideSePega();
-int decideSeLarga();
+int decideSePega(int i, int j);
+int decideSeLarga(int i, int j);
 
 
 char cenario[TAM][TAM]; // ' ' = nada, '.' = viva, '*' = morta
@@ -35,7 +35,7 @@ int main(){
     
     formigasVivas = iniciaCenario();
 
-    for(i = 1; i < 100; i++){
+    for(i = 1; i < 1500; i++){ // 1500 interacoes
         imprimeCenario();
         usleep(1000*80); // 80ms
         limpaTela();        
@@ -122,7 +122,8 @@ void realizaMovimento(){
                     decisao = decideSePega(i-1, j);
                     if(decisao == 1){
                         vivas[i][j] = 2; // formiga passou a estar carregando
-                        mortas[i-1][j] = 0; // remove a morta                    
+                        mortas[i-1][j] = 0; // remove a morta
+                        cenario[i-1][j] = ' ';                    
                     }                
                 }
                 else if(mortas[i+1][j] == 1){ // se esta no sul
@@ -130,6 +131,7 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 2;
                         mortas[i+1][j] = 0;
+                        cenario[i+1][j] = ' ';
                     }
                 }
                 else if(mortas[i][j+1] == 1){ // se esta no leste
@@ -137,6 +139,7 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 2;
                         mortas[i][j+1] = 0;
+                        cenario[i][j+1] = ' ';
                     }
                 }
                 else if(mortas[i][j-1] == 1){ // se esta no oeste
@@ -144,6 +147,7 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 2;
                         mortas[i][j-1] = 0;
+                        cenario[i][j-1] = ' ';                    
                     }
                 }
             }
@@ -182,6 +186,7 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 1; // formiga passou a estar carregando
                         mortas[i][j] = 1; // larga a morta onde esta
+                        cenario[i][j] = '*';
                     }
                 }
                 else if(mortas[i+1][j] == 1){ // se esta no sul
@@ -189,6 +194,7 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 1;
                         mortas[i][j] = 1;
+                        cenario[i][j] = '*';
                     }
                 }
                 else if(mortas[i][j+1] == 1){ // se esta no leste
@@ -196,6 +202,7 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 1;
                         mortas[i][j] = 1;
+                        cenario[i][j] = '*';
                     }
                 }
                 else if(mortas[i][j-1] == 1){ // se esta no oeste
@@ -203,6 +210,7 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 1;
                         mortas[i][j] = 1;
+                        cenario[i][j] = '*';
                     }
                 }
             }
@@ -212,18 +220,82 @@ void realizaMovimento(){
 
 
 /* Funcoes de decisao */
-int decideSePega(){
-    int decisao; // 1 = pega, 0 = nao pega
+int decideSePega(int i, int j){
+    int cont = 0, a, b; // contagem de formigas agrupadas
+    int r = RAIO, sum = 0;
+    float chance;    
 
-    
+    // caso o raio seja maior do que falta para a borda do cenario
+    if(i < RAIO)
+        r = 1;
+    else if(j < RAIO)
+        r = 1;
 
-    return decisao;
+    srand((unsigned)time(NULL));
+
+    // contagem de mortas em relacao ao raio de visao
+    for(a = i - r; a < i + r; a++){
+        for(b = j - r; b < j + r; b++){           
+            if(mortas[a][b] == 1)
+                cont++;
+        }    
+    }
+
+    /* CALCULO DECISAO */
+    for(a = 1; a < RAIO; a++)
+        sum += (TAM * a); 
+
+    chance = (sum - cont) / sum;
+
+    if(chance == 1)
+        chance -= 0.2; // 98%
+    else if(chance == 0)
+        chance += 0.2; // 2%
+
+
+    if(chance > rand() % 100)
+        return 1; // pega
+    else
+        return 0; // nao pega
 }
 
-int decideSeLarga(){
-    int decisao; // 1 = pega, 0 = nao pega    
+int decideSeLarga(int i, int j){
+    int cont = 0, a, b; // contagem de formigas agrupadas
+    int r = RAIO, sum = 0;
+    float chance;    
 
-    return decisao;
+    // caso o raio seja maior do que falta para a borda do cenario
+    if(i < RAIO)
+        r = 1;
+    else if(j < RAIO)
+        r = 1;
+
+    srand((unsigned)time(NULL));
+
+    // contagem de mortas em relacao ao raio de visao
+    for(a = i - r; a < i + r; a++){
+        for(b = j - r; b < j + r; b++){           
+            if(mortas[a][b] == 1)
+                cont++;
+        }    
+    }
+
+    /* CALCULO DECISAO */
+    for(a = 1; a < RAIO; a++)
+        sum += (TAM * a); 
+
+    chance = cont / sum;
+
+    if(chance == 1)
+        chance -= 0.2; // 98%
+    else if(chance == 0)
+        chance += 0.2; // 2%
+
+
+    if(chance < rand() % 100)
+        return 1; // pega
+    else
+        return 0; // nao pega
 }
 
 
