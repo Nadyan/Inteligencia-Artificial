@@ -16,7 +16,7 @@ int decideSePega(int i, int j);
 int decideSeLarga(int i, int j);
 
 
-char cenario[TAM][TAM]; // ' ' = nada, '.' = viva, '*' = morta
+char cenario[TAM][TAM]; // ' ' = nada, '.' = viva, '*' = morta, '+' = carregando
 int vivas[TAM][TAM]; // 0 = nada, 1 = formiga vazia, 2 = formiga carregando
 int mortas[TAM][TAM]; // 0 = nada, 1 = formiga morta
 int espacoVazio[TAM][TAM]; // 0 = nada, 1 = espaco vazio
@@ -24,23 +24,37 @@ int raioVisao[RAIO][RAIO]; // matriz de visao da formiga. 0 = nada, 1 = formiga 
 
 
 int main(){
-    int i, j, formigasVivas;
+    int i, j, formigasVivas, formigasMortas, x, y;
 
     // inicia a matriz de formigas vivas = nada
     for(i = 0; i < TAM; i++){
         for(j = 0; j < TAM; j++){
             vivas[i][j] = 0;
+            mortas[i][j] = 0;
         }
     }    
     
     formigasVivas = iniciaCenario();
+    formigasVivas = 0;
+    formigasMortas = 0;
 
-    for(i = 1; i < 1500; i++){ // 1500 interacoes
+    for(i = 1; i < 250; i++){ // 1500 interacoes
         imprimeCenario();
         usleep(1000*80); // 80ms
         limpaTela();        
         realizaMovimento();
-        printf("interacao n: %d\n", i+1);
+        printf("interacao n: %d\nvivas: %d\nmortas: %d\n", i+1, formigasVivas, formigasMortas);
+        formigasVivas = 0; formigasMortas = 0;
+
+        // verificacao de perda ou aumento de itens
+        for(x = 0; x < TAM; x++){
+            for(y = 0; y < TAM; y++){
+                if(vivas[x][y] == 1 || vivas[x][y] == 2)
+                    formigasVivas++;
+                if(mortas[x][y] == 1)
+                    formigasMortas++;
+            }
+        }
     }
 
 
@@ -64,8 +78,8 @@ int iniciaCenario(){
                 qtdFormigasMortas++;
                 mortas[i][j] = 1;
             }            
-            else if(chance > 70){
-                cenario[i][j] = '.'; //se der maior que 70, inicia com uma formiga viva
+            else if(chance > 85){
+                cenario[i][j] = '.'; //se der maior que 85, inicia com uma formiga viva
                 qtdFormigasVivas++;
                 vivas[i][j] = 1;
             }else{
@@ -123,7 +137,8 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 2; // formiga passou a estar carregando
                         mortas[i-1][j] = 0; // remove a morta
-                        cenario[i-1][j] = ' ';                    
+                        cenario[i-1][j] = ' ';
+                        cenario[i][j] = '+';                    
                     }                
                 }
                 else if(mortas[i+1][j] == 1){ // se esta no sul
@@ -132,6 +147,7 @@ void realizaMovimento(){
                         vivas[i][j] = 2;
                         mortas[i+1][j] = 0;
                         cenario[i+1][j] = ' ';
+                        cenario[i][j] = '+';
                     }
                 }
                 else if(mortas[i][j+1] == 1){ // se esta no leste
@@ -140,6 +156,7 @@ void realizaMovimento(){
                         vivas[i][j] = 2;
                         mortas[i][j+1] = 0;
                         cenario[i][j+1] = ' ';
+                        cenario[i][j] = '+';
                     }
                 }
                 else if(mortas[i][j-1] == 1){ // se esta no oeste
@@ -147,10 +164,12 @@ void realizaMovimento(){
                     if(decisao == 1){
                         vivas[i][j] = 2;
                         mortas[i][j-1] = 0;
-                        cenario[i][j-1] = ' ';                    
+                        cenario[i][j-1] = ' ';
+                        cenario[i][j] = '+';                    
                     }
                 }
             }
+
             if(vivas[i][j] == 2){ // se a formiga em i j estiver carregando
                 /* anda para uma casa aleatoria */
                 movimento = rand() % 100;
@@ -159,32 +178,32 @@ void realizaMovimento(){
                     vivas[i-1][j] = 2;
                     vivas[i][j] = 0;
                     cenario[i][j] = ' ';
-                    cenario[i-1][j] = '.';        
+                    cenario[i-1][j] = '+'; // + é formiga carregada        
                 }
                 if(movimento > 25 && movimento < 50 && vivas[i+1][j] != 1 && vivas[i+1][j] != 2 && mortas[i+1][j] != 1){ // anda para o sul
                     vivas[i+1][j] = 2;
                     vivas[i][j] = 0;
                     cenario[i][j] = ' ';
-                    cenario[i+1][j] = '.';
+                    cenario[i+1][j] = '+';
                 }
                 if(movimento > 50 && movimento < 75 && vivas[i][j+1] != 1 && vivas[i][j+1] != 2 && mortas[i][j+1] != 1){ // anda para leste
                     vivas[i][j+1] = 2;
                     vivas[i][j] = 0;
                     cenario[i][j] = ' ';
-                    cenario[i][j+1] = '.';
+                    cenario[i][j+1] = '+';
                 }
                 if(movimento > 75 && vivas[i][j-1] != 1 && vivas[i][j-1] != 2 && mortas[i][j-1] != 1){ // anda para oeste
                     vivas[i][j-1] = 2;
                     vivas[i][j] = 0;
                     cenario[i][j] = ' ';
-                    cenario[i][j-1] = '.';
+                    cenario[i][j-1] = '+';
                 }
 
                 // procura formigas mortas nas celulas adjacentes e se encontrar, chama decideSeLarga()
                 if(mortas[i-1][j] == 1){ // se esta no norte
                     decisao = decideSeLarga(i-1, j);
                     if(decisao == 1){
-                        vivas[i][j] = 1; // formiga passou a estar carregando
+                        vivas[i][j] = 1; // formiga passou a estar vazia
                         mortas[i][j] = 1; // larga a morta onde esta
                         cenario[i][j] = '*';
                     }
@@ -231,7 +250,7 @@ int decideSePega(int i, int j){
     else if(j < RAIO)
         r = 1;
 
-    srand((unsigned)time(NULL));
+    //srand((unsigned)time(NULL));
 
     // contagem de mortas em relacao ao raio de visao
     for(a = i - r; a < i + r; a++){
@@ -270,7 +289,7 @@ int decideSeLarga(int i, int j){
     else if(j < RAIO)
         r = 1;
 
-    srand((unsigned)time(NULL));
+    //srand((unsigned)time(NULL));
 
     // contagem de mortas em relacao ao raio de visao
     for(a = i - r; a < i + r; a++){
