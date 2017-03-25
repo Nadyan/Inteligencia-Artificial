@@ -74,13 +74,13 @@ int iniciaCenario(){
 
             chance = rand() % 100;
 
-            if(chance < 20){ //de 0 a 100, 30% de chance de ter morta
+            if(chance < 20){ //de 0 a 100, 20% de chance de ter morta
                 cenario[i][j] = '*'; //se a funcao de aleatorio der < 25, inicia com uma formiga morta
                 qtdFormigasMortas++;
                 mortas[i][j] = 1;
             }            
             else if(chance > 90){
-                cenario[i][j] = '.'; //se der maior que 85, inicia com uma formiga viva
+                cenario[i][j] = '.'; //se der maior que 90, inicia com uma formiga viva
                 qtdFormigasVivas++;
                 vivas[i][j] = 1;
             }else{
