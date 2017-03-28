@@ -1,3 +1,10 @@
+/*
+    Nadyan Suriel Pscheidt
+    Inteligência Artificial
+    Ant Clustering
+*/
+
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -11,8 +18,6 @@
 #define PRINT3 40000
 #define PRINT4 60000
 
-//fazer experimentos com raios 1, 5 e 10
-// 1, 20mil, 40mil, 60mil
 
 int iniciaCenario();
 void imprimeCenario();
@@ -51,13 +56,13 @@ int main(){
     //imprimeCenario();
 
     for(i = 1; i < 60000; i++){ // interacoes        
-        //imprimeCenario();
+        imprimeCenario();
         usleep(1000*TEMPO); // 1000*N = Nms
         novaSemente += TEMPO; // adiciona 50ms para geracao da nova semente         
         realizaMovimento();
-        //limpaTela();
+        limpaTela();
         //printf("interacao n: %ld\nvivas: %d\nmortas: %d\nrand: %d\nqtd sementes utilizadas: %d\n", i+1, formigasVivas, formigasMortas, rand()%100, qtdSementesUsadas);
-        //printf("interacao n: %ld\n", i);
+        printf("interacao n: %ld\n", i);
         formigasVivas = 0; formigasMortas = 0;
 
         // verificacao de perda ou aumento de itens
@@ -77,11 +82,11 @@ int main(){
         }
 
 	// if utilizado apenas para os experimentos
-        if(i == PRINT1 || i == PRINT2 || i == PRINT3 || i == PRINT4){
+   /*   if(i == PRINT1 || i == PRINT2 || i == PRINT3 || i == PRINT4){
             imprimeCenario();   
             printf("\n----\n");
         }
-    }
+    }*/
 
     imprimeCenario();
 
