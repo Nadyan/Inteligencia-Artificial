@@ -4,10 +4,15 @@
 #include <unistd.h>
 
 #define TAM 50 // cenario TAMxTAM
-#define RAIO 5
+#define RAIO 1
 #define TEMPO 50
+#define PRINT1 1
+#define PRINT2 20000
+#define PRINT3 40000
+#define PRINT4 60000
 
 //fazer experimentos com raios 1, 5 e 10
+// 0, 8mil, 20mil, 35mil, 52mil, 66mil, 102mil, 125mil, 151mil, 168mil, 177mil, 187mil, 200 mil
 
 int iniciaCenario();
 void imprimeCenario();
@@ -33,6 +38,7 @@ int main(){
         for(j = 0; j < TAM; j++){
             vivas[i][j] = 0;
             mortas[i][j] = 0;
+            cenario[i][j] = ' ';
         }
     }    
     
@@ -42,16 +48,16 @@ int main(){
     formigasVivas = 0;
     formigasMortas = 0;
 
-    imprimeCenario();
+    //imprimeCenario();
 
-    for(i = 1; i > 0; i++){ // interacoes        
-        imprimeCenario();
+    for(i = 1; i < 60000; i++){ // interacoes        
+        //imprimeCenario();
         usleep(1000*TEMPO); // 1000*N = Nms
         novaSemente += TEMPO; // adiciona 50ms para geracao da nova semente         
         realizaMovimento();
-        limpaTela();
+        //limpaTela();
         //printf("interacao n: %ld\nvivas: %d\nmortas: %d\nrand: %d\nqtd sementes utilizadas: %d\n", i+1, formigasVivas, formigasMortas, rand()%100, qtdSementesUsadas);
-        printf("interacao n: %ld\n", i);
+        //printf("interacao n: %ld\n", i);
         formigasVivas = 0; formigasMortas = 0;
 
         // verificacao de perda ou aumento de itens
@@ -68,6 +74,12 @@ int main(){
             srand((unsigned)time(NULL));
             novaSemente = 0;
             qtdSementesUsadas++;
+        }
+
+	// if utilizado apenas para os experimentos
+        if(i == PRINT1 || i == PRINT2 || i == PRINT3 || i == PRINT4){
+            imprimeCenario();   
+            printf("\n----\n");
         }
     }
 
@@ -86,8 +98,8 @@ int iniciaCenario(){
 
             chance = rand() % 100;
 
-            if(chance < 10){ //de 0 a 100, 20% de chance de ter morta
-                cenario[i][j] = '*'; //se a funcao de aleatorio der < 25, inicia com uma formiga morta
+            if(chance < 20){ //de 0 a 100, 20% de chance de ter morta
+                cenario[i][j] = '*'; //se a funcao de aleatorio der < 20, inicia com uma formiga morta
                 qtdFormigasMortas++;
                 mortas[i][j] = 1;
             }            
@@ -326,9 +338,9 @@ void realizaMovimento(){
 
 /* Funcoes de decisao */
 int decideSePega(int i, int j){
-    int cont = 0, a, b; // contagem de formigas agrupadas
+    int cont = 0, a, b, area; // contagem de formigas agrupadas
     int r = RAIO, sum = 0;
-    float chance, area;    
+    float chance;    
     int rvc; // raio vertical para cima
     int rvb; // raio vertical para baixo
     int rhe; // raio horizontal para esquerda
@@ -365,32 +377,32 @@ int decideSePega(int i, int j){
     // contagem de mortas em relacao ao raio de visao
     for(a = i - rvc; a < i + rvb; a++){
         for(b = j - rhe; b < j + rhd; b++){           
-            if(mortas[a][b] == 1)
-                cont++; // qtd de morta nos arredores
-            area++;
+            if(mortas[a][b] == 0)
+                cont++; // qtd de espaços vazios arredores
+            area++;     // qtd total de espaços, vazios e cheios
         }
     }
 
     // CALCULO DECISAO
-    // chance = (area de visao - qtdMortas) / area de visao
-    chance = (area - cont) / area;
+    // chance = (vazios/total)^2 * 100
+    chance = ((cont/area)*(cont/area)) * 100;
 
-    if(chance == 1.0)
-        chance -= 0.5; // 95%
-    else if(chance == 0.0)
-        chance += 0.5; // 5%
+    if(chance == 100)
+        chance -= 5; // 95%
+    else if(chance == 0)
+        chance += 5; // 5%
 
 
-    if(((int)chance*100) >= rand() % 100)
+    if(((int)chance) >= rand() % 100)
         return 1; // pega
     else
         return 0; // nao pega
 }
 
 int decideSeLarga(int i, int j){
-    int cont = 0, a, b; // contagem de formigas agrupadas
+    int cont = 0, a, b, area; // contagem de formigas agrupadas
     int r = RAIO, sum = 0;
-    float chance, area;    
+    float chance;    
     int rvc; // raio vertical para cima
     int rvb; // raio vertical para baixo
     int rhe; // raio horizontal para esquerda
@@ -435,16 +447,16 @@ int decideSeLarga(int i, int j){
     }
 
     // CALCULO DECISAO
-    //chance = (area de visao - qtdMortas) / area de visao;
-    chance = (area - cont) / area;
+    //chance = (mortas/total)^2 * 100
+    chance = (cont/area) * 100;
 
-    if(chance == 1.0)
-        chance -= 0.5; // 95%
-    else if(chance == 0.0)
-        chance += 0.5; // 5%
+    if(chance == 100.0)
+        chance -= 2.0; // 98%
+    else if(chance == 0)
+        chance += 2.0; // 2%
 
 
-    if(((int)chance*100) <= rand() % 100)
+    if(((int)chance) >= rand() % 100)
         return 1; // pega
     else
         return 0; // nao pega
@@ -467,32 +479,5 @@ void imprimeCenario(){
         printf("\n");
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
