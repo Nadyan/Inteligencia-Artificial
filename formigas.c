@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #define TAM 50 // cenario TAMxTAM
-#define RAIO 1
+#define RAIO 5
 #define TEMPO 50
 #define PRINT1 1
 #define PRINT2 20000
@@ -12,7 +12,7 @@
 #define PRINT4 60000
 
 //fazer experimentos com raios 1, 5 e 10
-// 0, 8mil, 20mil, 35mil, 52mil, 66mil, 102mil, 125mil, 151mil, 168mil, 177mil, 187mil, 200 mil
+// 1, 20mil, 40mil, 60mil
 
 int iniciaCenario();
 void imprimeCenario();
