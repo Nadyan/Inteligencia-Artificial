@@ -85,8 +85,8 @@ int main(){
    /*   if(i == PRINT1 || i == PRINT2 || i == PRINT3 || i == PRINT4){
             imprimeCenario();   
             printf("\n----\n");
-        }
-    }*/
+        }*/
+    }
 
     imprimeCenario();
 
