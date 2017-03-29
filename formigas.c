@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 #define TAM 50 // cenario TAMxTAM
-#define RAIO 5
+#define RAIO 1
 #define TEMPO 50
 #define PRINT1 1
 #define PRINT2 20000
