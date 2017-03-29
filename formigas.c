@@ -453,7 +453,7 @@ int decideSeLarga(int i, int j){
 
     // CALCULO DECISAO
     //chance = (mortas/total)^2 * 100
-    chance = (cont/area) * 100;
+    chance = ((cont/area)*(cont/area)) * 100;
 
     if(chance == 100.0)
         chance -= 2.0; // 98%
