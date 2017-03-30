@@ -1,7 +1,7 @@
 /*
     Nadyan Suriel Pscheidt
     Inteligência Artificial
-    Ant Clustering
+    Ant Clustering com dados homogeneos
 */
 
 
