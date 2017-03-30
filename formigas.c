@@ -201,7 +201,7 @@ void realizaMovimento(){
                 // procura formigas mortas nas celulas adjacentes e se encontrar, chama decideSePega()
                 if(andou == 1){                    
                     if(d > 0 && d < TAM-1 && e < TAM-1 && e > 0){  // se nao tá em nenhuma borda                  
-                        if(mortas[d-1][e] == 1 && achou == 0 && vivas[d-1][e]){ // se esta no norte
+                        if(mortas[d-1][e] == 1 && achou == 0 && vivas[d-1][e] == 0){ // se esta no norte
                             decisao = decideSePega(d-1, e);
                             if(decisao == 1){
                                 vivas[d][e] = 0; // formiga passou a estar carregando
