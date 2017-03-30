@@ -126,9 +126,9 @@ int main(){
 void iniciaCenario(){
     int i, j;
     int chance, qtdFormigasVivas = 0, qtdFormigasMortas = 0, qtdCelulasVazias = 0;
-    int escolhida[400];
+    int escolhida[QTD_DADOS];
 
-    for(i = 1; i < 400; i++)
+    for(i = 1; i < QTD_DADOS; i++)
         escolhida[i] = 0; // vetor de mortas que ja foram distribuidas no cenario
 
     for(i = 1; i < TAM-1; i++){
@@ -148,14 +148,14 @@ void iniciaCenario(){
     }
      
     // espalhar os 400 dados pelo cenario de forma aleatoria
-    while(qtdFormigasMortas < 400){        
+    while(qtdFormigasMortas < QTD_DADOS){        
         for(i = 1; i < TAM-1; i++){
             for(j = 1; j < TAM-1; j++){
                 if(espacoVazio[i][j] == 1){
 
                     chance = rand() % 100; // chance de cair uma morta na posicao i, j
 
-                    if(chance > 80){
+                    if(chance > 90){
                         chance = rand() % 400; // sorteia qual das mortas
 
                         if(escolhida[chance] == 0){
