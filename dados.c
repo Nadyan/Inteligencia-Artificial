@@ -28,8 +28,7 @@ typedef struct{
 }FormigaMorta;
 
 typedef struct{
-    int vazia; // 1 = vazia, 2 = cheia
-    int idx;
+    int idx; // 1 = vazia, 2 = cheia
     
     //caracteristicas caso esteja carregando uma morta (vazia = 2)    
     double col1;
@@ -379,6 +378,11 @@ void realizaMovimento(){
                     d = i-1;
                     e = j;   
 
+                    // transfere as caracteristicas
+                    vivas[i-1][j].col1 = vivas[i][j].col1;
+                    vivas[i-1][j].col2 = vivas[i][j].col2;
+                    vivas[i-1][j].tipo = vivas[i][j].tipo;
+
                     andou = 1;    
                 }
                 else if(i != TAM-1 && (movimento >= 25 && movimento < 50) && vivas[i+1][j].idx != 1 && vivas[i+1][j].idx != 2 && mortas[i+1][j].idx != 1){ // anda para o sul
@@ -388,6 +392,10 @@ void realizaMovimento(){
                     cenario[i+1][j] = '+';                    
                     d = i+1;
                     e = j;
+
+                    vivas[i+1][j].col1 = vivas[i][j].col1;
+                    vivas[i+1][j].col2 = vivas[i][j].col2;
+                    vivas[i+1][j].tipo = vivas[i][j].tipo;
 
                     andou = 1;
                 }
@@ -399,6 +407,10 @@ void realizaMovimento(){
                     d = i;
                     e = j+1;
 
+                    vivas[i][j+1].col1 = vivas[i][j].col1;
+                    vivas[i][j+1].col2 = vivas[i][j].col2;
+                    vivas[i][j+1].tipo = vivas[i][j].tipo;
+
                     andou = 1;
                 }
                 else if(j != 0 && movimento >= 75 && vivas[i][j-1].idx != 1 && vivas[i][j-1].idx != 2 && mortas[i][j-1].idx != 1){ // anda para oeste
@@ -407,7 +419,11 @@ void realizaMovimento(){
                     cenario[i][j] = ' ';
                     cenario[i][j-1] = '+';
                     d = i;
-                    e = j-1;  
+                    e = j-1;
+
+                    vivas[i][j-1].col1 = vivas[i][j].col1;
+                    vivas[i][j-1].col2 = vivas[i][j].col2;
+                    vivas[i][j-1].tipo = vivas[i][j].tipo;  
 
                     andou = 1;              
                 }
