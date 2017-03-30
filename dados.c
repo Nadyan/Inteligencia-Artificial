@@ -23,7 +23,7 @@
 typedef struct{
     double col1;    // coluna 1
     double col2;    // coluna 2
-    int tipo;       // 1 = %, 2 = #, 3 = @, 4 = $
+    int tipo;       // 1, 2, 3 e 4
     int idx;        // apenas para mostrar se tem ou nao dado na matriz mortas
 }FormigaMorta;
 
@@ -99,11 +99,8 @@ int main(){
         novaSemente += TEMPO; // adiciona 50ms para geracao da nova semente         
         realizaMovimento();
         limpaTela();
-        //printf("interacao n: %ld\nvivas: %d\n
-        //          mortas: %d\nrand: %d\n
-        //          qtd sementes utilizadas: %d\n
-        //          ", i+1, formigasVivas, formigasMortas, rand()%100, qtdSementesUsadas);
-        printf("interacao n: %ld\n", i);
+        printf("interacao n: %ld\nvivas: %d\nmortas: %d\nrand: %d\nqtd sementes utilizadas: %d\n", i+1, formigasVivas, formigasMortas, rand()%100, qtdSementesUsadas);
+        //printf("interacao n: %ld\n", i);
         formigasVivas = 0; formigasMortas = 0;
 
         // verificacao de perda ou aumento de itens
@@ -214,8 +211,16 @@ void realizaMovimento(){
 
                     if(mortas[i][j].idx == 0)                
                         cenario[i][j] = ' ';
-                    else
-                        cenario[i][j] = '*';
+                    else{
+                        if(mortas[i][j].tipo == 1)                        
+                            cenario[i][j] = '1';
+                        else if(mortas[i][j].tipo == 2)
+                            cenario[i][j] = '2';
+                        else if(mortas[i][j].tipo == 3)
+                            cenario[i][j] = '3';
+                        else if(mortas[i][j].tipo == 4)
+                            cenario[i][j] = '4';
+                    }                    
 
                     cenario[i-1][j] = '.';  
                     d = i-1; // coordenada i deslocada
@@ -229,8 +234,16 @@ void realizaMovimento(){
 
                     if(mortas[i][j].idx == 0)                
                         cenario[i][j] = ' ';
-                    else
-                        cenario[i][j] = '*';
+                    else{
+                        if(mortas[i][j].tipo == 1)                        
+                            cenario[i][j] = '1';
+                        else if(mortas[i][j].tipo == 2)
+                            cenario[i][j] = '2';
+                        else if(mortas[i][j].tipo == 3)
+                            cenario[i][j] = '3';
+                        else if(mortas[i][j].tipo == 4)
+                            cenario[i][j] = '4';
+                    }  
 
                     cenario[i+1][j] = '.';
                     d = i+1;
@@ -244,8 +257,16 @@ void realizaMovimento(){
 
                     if(mortas[i][j].idx == 0)                
                         cenario[i][j] = ' ';
-                    else
-                        cenario[i][j] = '*';
+                    else{
+                        if(mortas[i][j].tipo == 1)                        
+                            cenario[i][j] = '1';
+                        else if(mortas[i][j].tipo == 2)
+                            cenario[i][j] = '2';
+                        else if(mortas[i][j].tipo == 3)
+                            cenario[i][j] = '3';
+                        else if(mortas[i][j].tipo == 4)
+                            cenario[i][j] = '4';
+                    }  
 
                     cenario[i][j+1] = '.';
                     d = i;
@@ -259,8 +280,16 @@ void realizaMovimento(){
 
                     if(mortas[i][j].idx == 0)                
                         cenario[i][j] = ' ';
-                    else
-                        cenario[i][j] = '*';
+                    else{
+                        if(mortas[i][j].tipo == 1)                        
+                            cenario[i][j] = '1';
+                        else if(mortas[i][j].tipo == 2)
+                            cenario[i][j] = '2';
+                        else if(mortas[i][j].tipo == 3)
+                            cenario[i][j] = '3';
+                        else if(mortas[i][j].tipo == 4)
+                            cenario[i][j] = '4';
+                    }  
 
                     cenario[i][j-1] = '.';
                     d = i;
@@ -392,7 +421,7 @@ void realizaMovimento(){
                                 vivas[d][e].idx = 1; // formiga passou a estar vazia
                                 mortas[d][e].idx = 1; // larga a morta onde esta
                                     
-                                if(vivas[d][e].tipo == 1) // largou uma morta do tipo 1, etc                                    
+                                if(vivas[d][e].tipo == 1) // largou uma morta do tipo 1                                   
                                     cenario[d][e] = '1';
                                 else if(vivas[d][e].tipo == 2)
                                     cenario[d][e] = '2';
