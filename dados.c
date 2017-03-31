@@ -11,10 +11,11 @@
 
 #define TAM 50 // cenario TAMxTAM
 #define RAIO 1
+#define ALFA 9 // fator de dissimilaridade
 #define TEMPO 50
 #define QTD_DADOS 400
 
-// parametrod do print
+// parametros do print
 #define PRINT1 1
 #define PRINT2 20000
 #define PRINT3 40000
@@ -68,14 +69,6 @@ int main(){
         fscanf(f, "%lf", &dados[i].col2);
         fscanf(f, "%d", &dados[i].tipo);
     }
-
-    /*
-    for(i = 0; i < QTD_DADOS; i++){
-        printf("%f\t", dados[i].col1);
-        printf("%f\t", dados[i].col2);
-        printf("%d\n", dados[i].tipo);
-    }
-    */
 
     // inicia a matriz de formigas vivas = nada
     for(i = 0; i < TAM; i++){
