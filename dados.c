@@ -14,7 +14,7 @@
 
 #define TAM 50 // cenario TAMxTAM
 #define RAIO 1
-#define ALFA 5 // fator de dissimilaridade
+#define ALFA 8 // fator de dissimilaridade
 #define TEMPO 50
 #define QTD_DADOS 400
 #define K1 0.014    // valor inicial = 0.014
