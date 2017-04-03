@@ -2,24 +2,31 @@
     Nadyan Suriel Pscheidt
     Inteligência Artificial
     Ant Clustering com dados heterogeneos
+
+    gcc -o dados dados.c -lm
 */
 
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 
 #define TAM 50 // cenario TAMxTAM
 #define RAIO 1
-#define ALFA 9 // fator de dissimilaridade
+#define ALFA 5 // fator de dissimilaridade
 #define TEMPO 50
 #define QTD_DADOS 400
+#define K1 0.014    // valor inicial = 0.014
+#define K2 0.615    // valor inicial = 0.615
 
 // parametros do print
 #define PRINT1 1
 #define PRINT2 20000
 #define PRINT3 40000
 #define PRINT4 60000
+#define PRINT5 100000
+#define PRINT6 200000
 
 typedef struct{
     double col1;    // coluna 1
@@ -82,16 +89,14 @@ int main(){
     srand((unsigned)time(NULL));
 
     iniciaCenario();
-    imprimeCenario();
 
-
-    for(i = 1; i < 1000; i++){ // interacoes        
-        imprimeCenario();
+    for(i = 1; i <= PRINT6; i++){ // interacoes        
+        //imprimeCenario();
         usleep(1000*TEMPO); // 1000*N = Nms
         novaSemente += TEMPO; // adiciona 50ms para geracao da nova semente         
         realizaMovimento();
-        limpaTela();
-        printf("interacao n: %ld\nvivas: %d\nmortas: %d\nrand: %d\nqtd sementes utilizadas: %d\n", i+1, formigasVivas, formigasMortas, rand()%100, qtdSementesUsadas);
+        //limpaTela();
+        //printf("interacao n: %ld\nvivas: %d\nmortas: %d\nrand: %d\nqtd sementes utilizadas: %d\n", i+1, formigasVivas, formigasMortas, rand()%100, qtdSementesUsadas);
         //printf("interacao n: %ld\n", i);
         formigasVivas = 0; formigasMortas = 0;
 
@@ -111,11 +116,11 @@ int main(){
             qtdSementesUsadas++;
         }
 
-	// if utilizado apenas para os experimentos
-   /*   if(i == PRINT1 || i == PRINT2 || i == PRINT3 || i == PRINT4){
+        // if utilizado apenas para os experimentos
+        if(i == PRINT1 || i == PRINT2 || i == PRINT3 || i == PRINT4 || i == PRINT5 || i == PRINT6){
             imprimeCenario();   
-            printf("\n----\n");
-        }*/
+            printf("\n---- %ld\n", i);
+        }
     }
 
     //imprimeCenario();
@@ -149,7 +154,7 @@ void iniciaCenario(){
     }
      
     // espalhar os 400 dados pelo cenario de forma aleatoria
-    while(qtdFormigasMortas < QTD_DADOS){        
+    while(qtdFormigasMortas < QTD_DADOS-1){        
         for(i = 1; i < TAM-1; i++){
             for(j = 1; j < TAM-1; j++){
                 if(espacoVazio[i][j] == 1){
@@ -157,12 +162,13 @@ void iniciaCenario(){
                     chance = rand() % 100; // chance de cair uma morta na posicao i, j
 
                     if(chance > 90){
-                        qual = rand() % 400; // sorteia qual das mortas
+                        qual = rand() % QTD_DADOS; // sorteia qual das mortas
 
                         if(escolhida[qual] == 0){
                             mortas[i][j] = dados[qual];
                             mortas[i][j].idx = 1;
                             qtdFormigasMortas++;
+                            //printf("%d\n", qtdFormigasMortas);
                             espacoVazio[i][j] = 0;
                             escolhida[qual] = 1;                            
 
@@ -178,10 +184,9 @@ void iniciaCenario(){
                     }
                 }
             }
-        }            
+        }
     }
 }
-// COLCOAR /* AQUI PARA COMENTAR TUDO DAQUI PRA BAIXO:
 
 
 void realizaMovimento(){
@@ -520,15 +525,13 @@ void realizaMovimento(){
 int decideSePega(int i, int j, int tipo){
     int cont = 0, a, b, area; // contagem de formigas agrupadas
     int r = RAIO, sum = 0;
-    float chance;    
+    double chance, similaridade, distancia, somatorio = 0.0;    
     int rvc; // raio vertical para cima
     int rvb; // raio vertical para baixo
     int rhe; // raio horizontal para esquerda
     int rhd; // raio horizontal para direita
 
     rvc = r; rvb = r; rhe = r; rhd = r; area = 0;
-
-    // VERIFICAR TIPO DE DADO PRIMEIRO
 
     // tratamento de bordas
     if(i < r && j > r) // borda superior
@@ -555,25 +558,37 @@ int decideSePega(int i, int j, int tipo){
         rvb = (TAM-1) - i;
         rhe = j;
     }
-
+   
     // contagem de mortas em relacao ao raio de visao
     for(a = i - rvc; a < i + rvb; a++){
         for(b = j - rhe; b < j + rhd; b++){           
             if(mortas[a][b].idx == 0)
                 cont++; // qtd de espaços vazios arredores
+            else if(mortas[a][b].idx == 1 && (a != i && b != j)){ // se nao for a formiga sendo analisada
+                //calculo do d(i,j) = sqrt((i1 - j1)²+(i2 - j2)²) -> i(1,2) e j(1,2)
+                distancia = sqrt(((mortas[i][j].col1 - mortas[a][b].col1)*(mortas[i][j].col1 - mortas[a][b].col1))+((mortas[i][j].col2 - mortas[a][b].col2)*(mortas[i][j].col2 - mortas[a][b].col2)));         
+                somatorio += (1.0 - (distancia / ALFA));
+            }
             area++;     // qtd total de espaços, vazios e cheios
         }
     }
 
+    //f(i) = 1/area * sum(1 - d(i,j)/ALFA)
+    similaridade = (double)(1.0/area) * somatorio;
+
+    if(similaridade < 0)
+        similaridade = 0;
+
     // CALCULO DECISAO
-    // chance = (vazios/total)^2 * 100
-    chance = ((cont/area)*(cont/area)) * 100;
+    // chance = (K1 / (K1+similaridade))²
+    chance = (K1/(K1 + similaridade)) * (K1/(K1  + similaridade));
+
+    chance = chance * 100;
 
     if(chance == 100)
         chance -= 5; // 95%
     else if(chance == 0)
         chance += 5; // 5%
-
 
     if(((int)chance) >= rand() % 100)
         return 1; // pega
@@ -584,15 +599,13 @@ int decideSePega(int i, int j, int tipo){
 int decideSeLarga(int i, int j, int tipo){
     int cont = 0, a, b, area; // contagem de formigas agrupadas
     int r = RAIO, sum = 0;
-    float chance;    
+    float chance, distancia, somatorio = 0.0, similaridade;    
     int rvc; // raio vertical para cima
     int rvb; // raio vertical para baixo
     int rhe; // raio horizontal para esquerda
     int rhd; // raio horizontal para direita
 
     rvc = r; rvb = r; rhe = r; rhd = r; area = 0;
-
-    // VERIFICAR TIPO DE DADO PRIMEIRO
 
     // tratamento de bordas
     if(i < r && j > r) // borda superior
@@ -626,19 +639,31 @@ int decideSeLarga(int i, int j, int tipo){
         for(b = j - rhe; b < j + rhd; b++){           
             if(mortas[a][b].idx == 1)
                 cont++;
+            if(mortas[a][b].idx == 1 && (a != i && b != j)){
+                //calculo do d(i,j) = sqrt((i1 - j1)²+(i2 - j2)²) -> i(1,2) e j(1,2)
+                distancia = sqrt(((mortas[i][j].col1 - mortas[a][b].col1)*(mortas[i][j].col1 - mortas[a][b].col1))+((mortas[i][j].col2 - mortas[a][b].col2)*(mortas[i][j].col2 - mortas[a][b].col2)));                
+                somatorio += (1.0 - (distancia / ALFA)); 
+            }
             area++;        
         }    
     }
 
+    //f(i) = 1/area * sum(1 - d(i,j)/ALFA)
+    similaridade = (double)(1/area) * somatorio;
+
+    if(similaridade < 0)
+        similaridade = 0;
+
     // CALCULO DECISAO
-    //chance = (mortas/total)^2 * 100
-    chance = ((cont/area)*(cont/area)) * 100;
+    //chance = (similaridade / (K2 + similaridade))²
+    chance = (similaridade / (K2 + similaridade)) * (similaridade / (K2 + similaridade));
+
+    chance = chance * 100; // ou 1000
 
     if(chance == 100.0)
         chance -= 2.0; // 98%
     else if(chance == 0)
         chance += 2.0; // 2%
-
 
     if(((int)chance) >= rand() % 100)
         return 1; // pega
