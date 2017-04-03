@@ -90,13 +90,13 @@ int main(){
 
     iniciaCenario();
 
-    for(i = 1; i <= PRINT6; i++){ // interacoes        
-        //imprimeCenario();
+    for(i = 1; i <= 60000; i++){ // interacoes        
+        imprimeCenario();
         usleep(1000*TEMPO); // 1000*N = Nms
         novaSemente += TEMPO; // adiciona 50ms para geracao da nova semente         
         realizaMovimento();
-        //limpaTela();
-        //printf("interacao n: %ld\nvivas: %d\nmortas: %d\nrand: %d\nqtd sementes utilizadas: %d\n", i+1, formigasVivas, formigasMortas, rand()%100, qtdSementesUsadas);
+        limpaTela();
+        printf("interacao n: %ld\nvivas: %d\nmortas: %d\nrand: %d\nqtd sementes utilizadas: %d\n", i+1, formigasVivas, formigasMortas, rand()%100, qtdSementesUsadas);
         //printf("interacao n: %ld\n", i);
         formigasVivas = 0; formigasMortas = 0;
 
@@ -117,13 +117,13 @@ int main(){
         }
 
         // if utilizado apenas para os experimentos
-        if(i == PRINT1 || i == PRINT2 || i == PRINT3 || i == PRINT4 || i == PRINT5 || i == PRINT6){
+        /*if(i == PRINT1 || i == PRINT2 || i == PRINT3 || i == PRINT4 || i == PRINT5 || i == PRINT6){
             imprimeCenario();   
             printf("\n---- %ld\n", i);
-        }
+        }*/
     }
 
-    //imprimeCenario();
+    imprimeCenario();
 
     return 0;
 }
