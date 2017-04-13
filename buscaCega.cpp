@@ -21,20 +21,27 @@ typedef struct{
 
 Ponto inicio, destino;
 int terreno[TAM][TAM];
+int visitados[TAM][TAM];
 
 void montaCenario();
 void imprimeCenario();
 void limpaTela();
-void dfs(int i, int *visitados);
+void dfs(int i, int j);
 
 int main(){
-  int visitados[TAM*TAM]; // vetor de posicoes visitadas
-  memset(visitados, 0, sizeof(visitados)); // zera o vetor
+
+  for(int i = 0; i < TAM; i++){
+    for(int j = 0; j < TAM; j++){
+      visitados[i][j] = 0;
+    }
+  }
 
   montaCenario();
   imprimeCenario();
 
-  dfs(0, visitados);
+  int start1 = inicio.x, star2 = inicio.y;
+
+  dfs(start1, star2);
 
   /* //Parte grafica
   sf::RenderWindow window(sf::VideoMode(800, 600), "Busca Cega");
@@ -90,17 +97,18 @@ void imprimeCenario(){
   }
 }
 
-void dfs(int i, int *visitados){
-  int j;
+void dfs(int i, int j){
 
-  visitados[i] = 1;
+  visitados[i][j] = 1;
 
   for(j = 0; j < TAM; j++){
-    if(!visitados[j] && terreno[i][j] != -1){
-      terreno[i][j] = 4;
-      limpaTela();
-      imprimeCenario();
-      dfs(j, visitados);
+    for(j = 0; j < TAM; j++){
+      if(!visitados[i][j] && terreno[i][j] != -1){
+        terreno[i][j] = 4;
+        limpaTela();
+        imprimeCenario();
+        dfs(j, i);
+      }
     }
   }
 }
