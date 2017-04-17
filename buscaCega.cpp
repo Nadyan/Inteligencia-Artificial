@@ -23,8 +23,8 @@
 
 /* struct para os pontos de origem e destino */
 typedef struct{
-  int x;
-  int y;
+    int x;
+    int y;
 }Ponto;
 
 /* Vars */
@@ -42,38 +42,38 @@ int uniforme(int i, int j);
 
 
 int main(){
-  int a; // retorno das funcs
-  double t1, t2, tf;
+    int a; // retorno das funcs
+    double t1, t2, tf;
 
-  for(int i = 0; i < TAM; i++){
-    for(int j = 0; j < TAM; j++){
-      visitados[i][j] = 0;
-    }
-  }
-
-  montaCenario();
-
-  //a = bfs(inicio.x, inicio.y);
-
-  a = uniforme(inicio.x, inicio.y);
-
-  // setup da janela
-  /*
-  sf::RenderWindow window(sf::VideoMode(800, 800), "Busca Cega");
-  sf::RectangleShape rectangle(sf::Vector2f(120, 50));
-  rectangle.setFillColor(sf::Color::Blue);
-
-  while(window.isOpen()){
-    sf::Event event;
-    while(window.pollEvent(event)){
-      if(event.type == sf::Event::Closed)
-        window.close();
+    for(int i = 0; i < TAM; i++){
+        for(int j = 0; j < TAM; j++){
+            visitados[i][j] = 0;
+        }
     }
 
-    window.clear(sf::Color::Black);
-    window.draw(rectangle);
-    window.display();
-  }*/
+    montaCenario();
+
+    //a = bfs(inicio.x, inicio.y);
+
+    a = uniforme(inicio.x, inicio.y);
+
+    // setup da janela
+    /*
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Busca Cega");
+    sf::RectangleShape rectangle(sf::Vector2f(120, 50));
+    rectangle.setFillColor(sf::Color::Blue);
+
+    while(window.isOpen()){
+      sf::Event event;
+      while(window.pollEvent(event)){
+        if(event.type == sf::Event::Closed)
+          window.close();
+      }
+
+      window.clear(sf::Color::Black);
+      window.draw(rectangle);
+      window.display();
+    }*/
 
 	return 0;
 }
@@ -92,118 +92,118 @@ void montaCenario(){
             fscanf(f, "%d", &terreno[i][j]);
 
             switch(terreno[i][j]){
-              case 0:
-                terrenoChar[i][j][0] = '0'; terrenoChar[i][j][1] = ' '; break;
-              case 1:
-                terrenoChar[i][j][0] = '1'; terrenoChar[i][j][1] = ' '; break;
-              case 2:
-                terrenoChar[i][j][0] = '2'; terrenoChar[i][j][1] = ' '; break;
-              case 3:
-                terrenoChar[i][j][0] = '3'; terrenoChar[i][j][1] = ' '; break;
+                case 0:
+                    terrenoChar[i][j][0] = '0'; terrenoChar[i][j][1] = ' '; break;
+                case 1:
+                    terrenoChar[i][j][0] = '1'; terrenoChar[i][j][1] = ' '; break;
+                case 2:
+                    terrenoChar[i][j][0] = '2'; terrenoChar[i][j][1] = ' '; break;
+                case 3:
+                    terrenoChar[i][j][0] = '3'; terrenoChar[i][j][1] = ' '; break;
             }
         }
     }
 }
 
 void imprimeCenario(){
-  int i, j;
+    int i, j;
 
-  printf("\n");
-
-  for(i = 0; i < TAM; i++){
-    for(j = 0; j < TAM; j++){
-      if(i == inicio.x && j == inicio.y)
-        printf("   ");
-      else if(i == destino.x && j == destino.y)
-        printf("   ");
-      else
-        printf("%c%c ", terrenoChar[i][j][0], terrenoChar[i][j][1]);
-    }
     printf("\n");
-  }
+
+    for(i = 0; i < TAM; i++){
+        for(j = 0; j < TAM; j++){
+            if(i == inicio.x && j == inicio.y)
+                printf("   ");
+            else if(i == destino.x && j == destino.y)
+                printf("   ");
+            else
+                printf("%c%c ", terrenoChar[i][j][0], terrenoChar[i][j][1]);
+        }
+        printf("\n");
+    }
 }
 
 int bfs(int i, int j){
-  terrenoChar[i][j][1] = '.';
-  visitados[i][j] = 1;
+    terrenoChar[i][j][1] = '.';
+    visitados[i][j] = 1;
 
-  limpaTela();
-  imprimeCenario();
-  usleep(1000*10);
+    limpaTela();
+    imprimeCenario();
+    usleep(1000*10);
 
-  if(i == destino.x && j == destino.y)
-    return 1;
-  else{
-    /* para cima */
-    if(i - 1 >= 0 && !visitados[i-1][j])
-      bfs(i-1, j);
-    /* para a direita */
-    else if(j + 1 < TAM && !visitados[i][j+1])
-      bfs(i, j+1);
-    /* para baixo */
-    else if(i + 1 < TAM && !visitados[i+1][j])
-      bfs(i+1, j);
-    /* para a esquerda */
-    else if(j - 1 >= 0 && !visitados[i][j-1])
-      bfs(i, j-1);
-  }
+    if(i == destino.x && j == destino.y)
+        return 1;
+    else{
+        /* para cima */
+        if(i - 1 >= 0 && !visitados[i-1][j])
+            bfs(i-1, j);
+        /* para a direita */
+        else if(j + 1 < TAM && !visitados[i][j+1])
+            bfs(i, j+1);
+        /* para baixo */
+        else if(i + 1 < TAM && !visitados[i+1][j])
+            bfs(i+1, j);
+        /* para a esquerda */
+        else if(j - 1 >= 0 && !visitados[i][j-1])
+            bfs(i, j-1);
+    }
 }
 
 int uniforme(int i, int j){
-  int menor = 4; // para encontrar o menor
-  int i2, j2;
+    int menor = 4; // para encontrar o menor
+    int i2, j2;
 
-  	/* Caso origem: 1 1
-  	        destino 40 40
-  	        funciona bem
-    */
+  	  /* Caso origem: 1 1
+  	          destino 40 40
+  	          funciona bem
+      */
 
-    /* SEG FAULT CAUSADO POR NAO ENTRAR EM NENHUM IF,
-     INICIANDO A RECURSAO COM J2 E I2 SENDO LIXO DE MEMORIA.
-     ENCONTRAR UMA FORMA DE TRATAR CASO NAO ENTRE EM NENHUM IF */
+      /* SEG FAULT CAUSADO POR NAO ENTRAR EM NENHUM IF,
+       INICIANDO A RECURSAO COM J2 E I2 SENDO LIXO DE MEMORIA.
+       ENCONTRAR UMA FORMA DE TRATAR CASO NAO ENTRE EM NENHUM IF */
 
-  terrenoChar[i][j][1] = '.';
-  visitados[i][j] = 1;
+    terrenoChar[i][j][1] = '.';
+    visitados[i][j] = 1;
 
-  limpaTela();
-  imprimeCenario();
-  usleep(1000*50);
+    limpaTela();
+    imprimeCenario();
+    usleep(1000*50);
 
-  if(i == destino.x && j == destino.y)
-    return 1;
-  else{
-    /* escolha do caminho de menor custo */
-    /* se for para cima */
-    if(i - 1 >= 0 && !visitados[i-1][j]){
-      if(terreno[i-1][j] < menor ){
-        i2 = i-1; j2 = j;
-        menor = terreno[i-1][j];
-      }
+    if(i == destino.x && j == destino.y)
+        return 1;
+    else{
+        /* escolha do caminho de menor custo */
+        /* se for para cima */
+        if(i - 1 >= 0 && !visitados[i-1][j]){
+            if(terreno[i-1][j] < menor ){
+                i2 = i-1; j2 = j;
+                menor = terreno[i-1][j];
+            } 
+        }
+        /* se for para a direitra */
+        if(j + 1 < TAM && !visitados[i][j+1]){
+            if(terreno[i][j+1] < menor){
+                i2 = i; j2 = j+1;
+                menor = terreno[i][j+1];
+            }
+        }
+        /* se for para baixo */
+        if(i + 1 < TAM && !visitados[i+1][j]){
+            if(terreno[i+1][j] < menor){
+                i2 = i+1; j2 = j;
+                menor = terreno[i+1][j];
+            }
+        }
+        /* se for para a esquerda */
+        if(j - 1 >= 0 && !visitados[i][j-1]){
+            if(terreno[i][j-1] < menor){
+                i2 = i; j2 = j-1;
+                menor = terreno[i][j-1];
+            }
+        }
+
+        uniforme(i2, j2);
     }
-    /* se for para a direitra */
-    if(j + 1 < TAM && !visitados[i][j+1]){
-      if(terreno[i][j+1] < menor){
-        i2 = i; j2 = j+1;
-        menor = terreno[i][j+1];
-      }
-    }
-    /* se for para baixo */
-    if(i + 1 < TAM && !visitados[i+1][j]){
-      if(terreno[i+1][j] < menor){
-        i2 = i+1; j2 = j;
-        menor = terreno[i+1][j];
-      }
-    }
-    /* se for para a esquerda */
-    if(j - 1 >= 0 && !visitados[i][j-1]){
-      if(terreno[i][j-1] < menor){
-        i2 = i; j2 = j-1;
-        menor = terreno[i][j-1];
-      }
-    }
-
-    uniforme(i2, j2);
-  }
 }
 
 void limpaTela(){
