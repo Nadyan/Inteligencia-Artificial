@@ -23,26 +23,33 @@ typedef struct{
 Ponto inicio, destino;
 int terreno[TAM][TAM];
 char terrenoChar[TAM][TAM];
-int visitados[TAM*TAM];
+int visitados[TAM][TAM];
 int frente = 0, cauda = 0;
 int fila[TAM];
 
 void montaCenario();
 void imprimeCenario();
 void limpaTela();
-void bfs(int i);
+int bfs(int i, int j);
 
 int main(){
+  int a; // retorno do bfs
 
-  memset(visitados, 0, sizeof(visitados));
+  for(int i = 0; i < TAM; i++){
+    for(int j = 0; j < TAM; j++){
+      visitados[i][j] = 0;
+    }
+  }
 
   montaCenario();
   imprimeCenario();
 
-  int start1 = inicio.x, star2 = inicio.y;
+  int start1 = inicio.x, start2 = inicio.y;
 
   //bfs(start1, star2);
-  bfs(start1);
+  a = bfs(start1, start2);
+
+  imprimeCenario();
 
 
   /* //Parte grafica
@@ -148,9 +155,30 @@ void bfs(int v){
 }*/
 
 // bfs segunda tentativa sem estrutura de grafo
-void bfs(int i, int j){
+int bfs(int i, int j){
+  terrenoChar[i][j] = '*';
+  visitados[i][j] = 1;
 
+  imprimeCenario();
+  //usleep(1000*10);
+  limpaTela();
 
+  if(i == destino.x && j == destino.y)
+    return 1;
+  else{
+    /* para cima */
+    if(i - 1 >= 0 && !visitados[i-1][j])
+      bfs(i-1, j);
+    /* para a direita */
+    if(j + 1 < TAM && !visitados[i][j+1])
+      bfs(i, j+1);
+    /* para baixo */
+    if(i + 1 < TAM && !visitados[i+1][j])
+      bfs(i+1, j);
+    /* para a esquerda */
+    if(j - 1 >= 0 && !visitados[i][j-1])
+      bfs(i, j-1);
+  }
 }
 
 void limpaTela(){
