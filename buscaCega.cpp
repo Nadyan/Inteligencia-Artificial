@@ -117,50 +117,12 @@ void imprimeCenario(){
   }
 }
 
-/* // bfs fail com estrutura de grafo
-void bfs(int v){
-
-    visitados[v] = 1;
-
-    // enfila vertice v
-    fila[cauda] = v; // insere na cauda
-    cauda++;
-
-    while (cauda != frente){ // condicao de fila vazia
-        int i = 0;
-        // dequeue
-        int u = fila[frente];
-        //printf("%d ", u);
-        frente++;
-
-        // checagem de vizinhos de u
-        for (i = 0; i < TAM; i++){
-            // se tem vizinho
-            if (!visitados[i] && (terreno[u][i] != -1)){
-                fila[cauda] = i;
-                cauda++;
-
-                visitados[i] = 1;
-                terrenoChar[u][i] = '*';
-
-                imprimeCenario();
-                usleep(1000*20);
-                limpaTela();
-
-                if(u == destino.x && i == destino.y)
-                    break;
-            }
-        }
-    }
-}*/
-
-// bfs segunda tentativa sem estrutura de grafo
 int bfs(int i, int j){
   terrenoChar[i][j] = '*';
   visitados[i][j] = 1;
 
   imprimeCenario();
-  //usleep(1000*10);
+  usleep(1000*10);
   limpaTela();
 
   if(i == destino.x && j == destino.y)
@@ -170,13 +132,13 @@ int bfs(int i, int j){
     if(i - 1 >= 0 && !visitados[i-1][j])
       bfs(i-1, j);
     /* para a direita */
-    if(j + 1 < TAM && !visitados[i][j+1])
+    else if(j + 1 < TAM && !visitados[i][j+1])
       bfs(i, j+1);
     /* para baixo */
-    if(i + 1 < TAM && !visitados[i+1][j])
+    else if(i + 1 < TAM && !visitados[i+1][j])
       bfs(i+1, j);
     /* para a esquerda */
-    if(j - 1 >= 0 && !visitados[i][j-1])
+    else if(j - 1 >= 0 && !visitados[i][j-1])
       bfs(i, j-1);
   }
 }
