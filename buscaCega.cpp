@@ -3,7 +3,11 @@
   Inteligencia artificial
   Busca Cega
 
-  g++ -o buscaCega buscaCega.cpp
+  Compilar:
+  sudo apt-get install libsfml-dev
+  g++ -c buscaCega.cpp
+  g++ -o buscaCega buscaCega.o -lsfml-graphics -lsfml-window -lsfml-system
+  ./buscaCega
 */
 
 #include <cstdio>
@@ -46,14 +50,13 @@ int main(){
 
   int start1 = inicio.x, start2 = inicio.y;
 
-  //bfs(start1, star2);
-  a = bfs(start1, start2);
+  a = bfs(inicio.x, inicio.y);
 
-  imprimeCenario();
-
-
-  /* //Parte grafica
-  sf::RenderWindow window(sf::VideoMode(800, 600), "Busca Cega");
+  // setup da janela
+  /*
+  sf::RenderWindow window(sf::VideoMode(800, 800), "Busca Cega");
+  sf::RectangleShape rectangle(sf::Vector2f(120, 50));
+  rectangle.setFillColor(sf::Color::Blue);
 
   while(window.isOpen()){
     sf::Event event;
@@ -63,9 +66,7 @@ int main(){
     }
 
     window.clear(sf::Color::Black);
-
-    // draw here
-
+    window.draw(rectangle);
     window.display();
   }*/
 
@@ -121,9 +122,9 @@ int bfs(int i, int j){
   terrenoChar[i][j] = '*';
   visitados[i][j] = 1;
 
+  limpaTela();
   imprimeCenario();
   usleep(1000*10);
-  limpaTela();
 
   if(i == destino.x && j == destino.y)
     return 1;
