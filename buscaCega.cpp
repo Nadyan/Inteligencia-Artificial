@@ -66,7 +66,7 @@ int main(){
     
     printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\nUniforme:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtdLarg, custoUni, qtdUni);
 
-    // setup da janela
+    // Interface grafica
     /*
     sf::RenderWindow window(sf::VideoMode(800, 800), "Busca Cega");
     sf::RectangleShape rectangle(sf::Vector2f(120, 50));
