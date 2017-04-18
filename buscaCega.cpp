@@ -150,6 +150,10 @@ int uniforme(int i, int j){
   int menor = 4; // para encontrar o menor
   int i2, j2;
 
+    /* SEG FAULT CAUSADO POR NAO ENTRAR EM NENHUM IF,
+     INICIANDO A RECURSAO COM J2 E I2 SENDO LIXO DE MEMORIA.
+     ENCONTRAR UMA FORMA DE TRATAR CASO NAO ENTRE EM NENHUM IF */
+
   terrenoChar[i][j][1] = '.';
   visitados[i][j] = 1;
 
