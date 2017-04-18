@@ -36,6 +36,7 @@ void montaCenario();
 void imprimeCenario();
 void limpaTela();
 int bfs(int i, int j);
+int uniforme(int i, int j);
 
 int main(){
   int a; // retorno do bfs
@@ -49,7 +50,9 @@ int main(){
 
   montaCenario();
 
-  a = bfs(inicio.x, inicio.y);
+  //a = bfs(inicio.x, inicio.y);
+
+  a = uniforme(inicio.x, inicio.y);
 
   // setup da janela
   /*
@@ -140,6 +143,54 @@ int bfs(int i, int j){
     /* para a esquerda */
     else if(j - 1 >= 0 && !visitados[i][j-1])
       bfs(i, j-1);
+  }
+}
+
+int uniforme(int i, int j){
+  int menor = 4; // para encontrar o menor
+  int i2, j2;
+
+  terrenoChar[i][j][1] = '.';
+  visitados[i][j] = 1;
+
+  limpaTela();
+  imprimeCenario();
+  usleep(1000*10);
+
+  if(i == destino.x && j == destino.y)
+    return 1;
+  else{
+    /* escolha do caminho de menor custo */
+    /* se for para cima */
+    if(i - 1 >= 0 && !visitados[i-1][j]){
+      if(terreno[i-1][j] < menor ){
+        i2 = i-1; j2 = j;
+        menor = terreno[i-1][j];
+      }
+    }
+    /* se for para a direitra */
+    if(j + 1 < TAM && !visitados[i][j+1]){
+      if(terreno[i][j+1] < menor){
+        i2 = i; j2 = j+1;
+        menor = terreno[i][j+1];
+      }
+    }
+    /* se for para baixo */
+    if(i + 1 < TAM && !visitados[i+1][j]){
+      if(terreno[i+1][j] < menor){
+        i2 = i+1; j2 = j;
+        menor = terreno[i+1][j];
+      }
+    }
+    /* se for para a esquerda */
+    if(j - 1 >= 0 && !visitados[i][j-1]){
+      if(terreno[i][j-1] < menor){
+        i2 = i; j2 = j-1;
+        menor = terreno[i][j-1];
+      }
+    }
+
+    uniforme(i2, j2);
   }
 }
 
