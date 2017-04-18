@@ -14,6 +14,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <unistd.h>
+#include <time.h>
 //#include <SFML/Graphics.hpp>
 
 #define TAM 42  //terreno TAMxTAM
@@ -38,6 +39,7 @@ int bfs(int i, int j);
 
 int main(){
   int a; // retorno do bfs
+  double t1, t2, tf;
 
   for(int i = 0; i < TAM; i++){
     for(int j = 0; j < TAM; j++){
@@ -46,9 +48,6 @@ int main(){
   }
 
   montaCenario();
-  imprimeCenario();
-
-  int start1 = inicio.x, start2 = inicio.y;
 
   a = bfs(inicio.x, inicio.y);
 
