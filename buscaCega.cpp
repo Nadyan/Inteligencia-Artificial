@@ -26,7 +26,7 @@ typedef struct{
 
 Ponto inicio, destino;
 int terreno[TAM][TAM];
-char terrenoChar[TAM][TAM];
+char terrenoChar[TAM][TAM][2];
 int visitados[TAM][TAM];
 int frente = 0, cauda = 0;
 int fila[TAM];
@@ -88,13 +88,13 @@ void montaCenario(){
 
             switch(terreno[i][j]){
               case 0:
-                terrenoChar[i][j] = '0'; break;
+                terrenoChar[i][j][0] = '0'; terrenoChar[i][j][1] = ' '; break;
               case 1:
-                terrenoChar[i][j] = '1'; break;
+                terrenoChar[i][j][0] = '1'; terrenoChar[i][j][1] = ' '; break;
               case 2:
-                terrenoChar[i][j] = '2'; break;
+                terrenoChar[i][j][0] = '2'; terrenoChar[i][j][1] = ' '; break;
               case 3:
-                terrenoChar[i][j] = '3'; break;
+                terrenoChar[i][j][0] = '3'; terrenoChar[i][j][1] = ' '; break;
             }
         }
     }
@@ -108,18 +108,18 @@ void imprimeCenario(){
   for(i = 0; i < TAM; i++){
     for(j = 0; j < TAM; j++){
       if(i == inicio.x && j == inicio.y)
-        printf("  ");
+        printf("   ");
       else if(i == destino.x && j == destino.y)
-        printf("  ");
+        printf("   ");
       else
-        printf("%c ", terrenoChar[i][j]);
+        printf("%c%c ", terrenoChar[i][j][0], terrenoChar[i][j][1]);
     }
     printf("\n");
   }
 }
 
 int bfs(int i, int j){
-  terrenoChar[i][j] = '*';
+  terrenoChar[i][j][1] = '.';
   visitados[i][j] = 1;
 
   limpaTela();
