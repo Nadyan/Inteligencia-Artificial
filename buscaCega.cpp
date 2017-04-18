@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <time.h>
+//#include "lista.h"
 //#include <SFML/Graphics.hpp>
 
 /* Defs */
@@ -59,7 +60,7 @@ int main(){
     montaCenario();
     limpaTela();
 
-    printf("\nExecutando Busca Cega em Largura:\n\n");
+    printf("\nExecutando Busca em Largura:\n\n");
     a = bfs(inicio.x, inicio.y);
 
     /* Montagem da matriz de resultados largura */
@@ -74,7 +75,7 @@ int main(){
             }
         }
     }
-
+/*
     initVisitados();
     montaCenario();
 
@@ -82,7 +83,7 @@ int main(){
     a = uniforme(inicio.x, inicio.y);
 
     /* Montagem da matriz de resultados uniforme */
-    for(i = 0; i < TAM; i++){
+  /*  for(i = 0; i < TAM; i++){
         for(j = 0; j < TAM; j++){
             if(terrenoChar[i][j][1] == '.'){
                 terrenoUni[i][j][0] = terrenoChar[i][j][0];
@@ -97,7 +98,7 @@ int main(){
     limpaTela();
     imprimeFinal();
     //printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\nUniforme:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtdLarg, custoUni, qtdUni);
-
+*/
     // Interface grafica
     /*
     sf::RenderWindow window(sf::VideoMode(800, 800), "Busca Cega");
@@ -163,29 +164,35 @@ int bfs(int i, int j){
     terrenoChar[i][j][1] = '.';
     visitados[i][j] = 1;
 
+	/* TA ERRADO, ESSE É O DFS! TEM QUE FAZER BFS */
+
     qtdLarg++; // contagem de posicoes
     custoLarg += terreno[i][j];
 
     limpaTela();
-    printf("\nExecutando Busca Cega em Largura:\n\n");
+    printf("\nExecutando Busca em Largura:\n\n");
     imprimeCenario();
-    usleep(1000*10);
+    usleep(1000*30);
 
     if(i == destino.x && j == destino.y)
         return 1;
     else{
         /* para cima */
-        if(i - 1 >= 0 && !visitados[i-1][j])
-            bfs(i-1, j);
+        if(i - 1 >= 0 && !visitados[i-1][j]){            
+			bfs(i-1, j);	
+		}
         /* para a direita */
-        else if(j + 1 < TAM && !visitados[i][j+1])
-            bfs(i, j+1);
+        else if(j + 1 < TAM && !visitados[i][j+1]){            
+			bfs(i, j+1);
+		}
         /* para baixo */
-        else if(i + 1 < TAM && !visitados[i+1][j])
-            bfs(i+1, j);
+        else if(i + 1 < TAM && !visitados[i+1][j]){           
+			bfs(i+1, j);
+		}
         /* para a esquerda */
-        else if(j - 1 >= 0 && !visitados[i][j-1])
-            bfs(i, j-1);
+        else if(j - 1 >= 0 && !visitados[i][j-1]){           
+			bfs(i, j-1);
+		}
     }
 }
 
@@ -209,12 +216,12 @@ int uniforme(int i, int j){
     limpaTela();
     printf("\n\nExecutando Busca Cega Uniforme:\n\n");
     imprimeCenario();
-    usleep(1000*20);
+    usleep(1000*30);
 
     if(i == destino.x && j == destino.y)
         return 1;
     else{
-        /* escolha do caminho de menor custo */
+        /* escolha do vizinho de menor custo */
         /* se for para cima */
         if(i - 1 >= 0 && !visitados[i-1][j]){
             if(terreno[i-1][j] < menor ){
