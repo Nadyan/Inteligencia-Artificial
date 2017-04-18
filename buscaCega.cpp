@@ -32,30 +32,39 @@ Ponto inicio, destino;
 int terreno[TAM][TAM];
 int visitados[TAM][TAM];
 char terrenoChar[TAM][TAM][2];
+int qtdLarg = 0, qtdUni = 0, custoLarg = 0, custoUni = 0;
 
 /* Funcs */
 void montaCenario();
 void imprimeCenario();
 void limpaTela();
+void initVisitados();
 int bfs(int i, int j);
 int uniforme(int i, int j);
 
 
 int main(){
     int a; // retorno das funcs
-    double t1, t2, tf;
 
-    for(int i = 0; i < TAM; i++){
-        for(int j = 0; j < TAM; j++){
-            visitados[i][j] = 0;
-        }
-    }
+    printf("Informe o ponto de inicio: ");
+    scanf("%d %d", &inicio.x, &inicio.y);
+    printf("Informe o ponto de destino: ");
+    scanf("%d %d", &destino.x, &destino.y);
 
+    initVisitados();
+    montaCenario();
+    limpaTela();
+
+    printf("\nExecutando Busca Cega em Largura:\n\n");
+    a = bfs(inicio.x, inicio.y);
+
+    initVisitados();
     montaCenario();
 
-    //a = bfs(inicio.x, inicio.y);
-
+    printf("\n\nExecutando Busca Cega Uniforme:\n\n");
     a = uniforme(inicio.x, inicio.y);
+    
+    printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\nUniforme:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtdLarg, custoUni, qtdUni);
 
     // setup da janela
     /*
@@ -81,11 +90,6 @@ int main(){
 void montaCenario(){
     FILE *f = fopen("terreno.txt", "r");
     int i, j;
-
-    printf("Informe o ponto de inicio: ");
-    scanf("%d %d", &inicio.x, &inicio.y);
-    printf("Informe o ponto de destino: ");
-    scanf("%d %d", &destino.x, &destino.y);
 
     for(i = 0; i < TAM; i++){
         for(j = 0; j < TAM; j++){
@@ -126,8 +130,12 @@ void imprimeCenario(){
 int bfs(int i, int j){
     terrenoChar[i][j][1] = '.';
     visitados[i][j] = 1;
+    
+    qtdLarg++; // contagem de posicoes
+    custoLarg += terreno[i][j];
 
     limpaTela();
+    printf("\nExecutando Busca Cega em Largura:\n\n");
     imprimeCenario();
     usleep(1000*10);
 
@@ -151,21 +159,23 @@ int bfs(int i, int j){
 
 int uniforme(int i, int j){
     int menor = 4; // para encontrar o menor
-    int i2, j2;
+    int i2 = 42, j2 = 42;
+    
+    qtdUni++; // contagem de posicoes
+    custoUni += terreno[i][j];
 
   	  /* Caso origem: 1 1
-  	          destino 40 40
+  	          destino 30 35
   	          funciona bem
       */
 
-      /* SEG FAULT CAUSADO POR NAO ENTRAR EM NENHUM IF,
-       INICIANDO A RECURSAO COM J2 E I2 SENDO LIXO DE MEMORIA.
-       ENCONTRAR UMA FORMA DE TRATAR CASO NAO ENTRE EM NENHUM IF */
+      /* DESCOBRIR FORMA DE TRATAR CAMINHOS SEM SAIDA */
 
     terrenoChar[i][j][1] = '.';
     visitados[i][j] = 1;
 
     limpaTela();
+    printf("\n\nExecutando Busca Cega Uniforme:\n\n");
     imprimeCenario();
     usleep(1000*50);
 
@@ -201,8 +211,22 @@ int uniforme(int i, int j){
                 menor = terreno[i][j-1];
             }
         }
+        if(i2 != 42 && j2 != 42) /* se entrou em algum if */
+            uniforme(i2, j2);
+        else{
+            printf("\n\nFalha na busca, caminho nao encontrado!\n\n");
+            return 1;   
+        }
+    }
+}
 
-        uniforme(i2, j2);
+void initVisitados(){
+    int i, j;
+    
+    for(int i = 0; i < TAM; i++){
+        for(int j = 0; j < TAM; j++){
+            visitados[i][j] = 0;
+        }
     }
 }
 
