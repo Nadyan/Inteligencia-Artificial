@@ -209,7 +209,7 @@ int uniforme(int i, int j){
     limpaTela();
     printf("\n\nExecutando Busca Cega Uniforme:\n\n");
     imprimeCenario();
-    usleep(1000*50);
+    usleep(1000*20);
 
     if(i == destino.x && j == destino.y)
         return 1;
@@ -269,7 +269,12 @@ void imprimeFinal(){
 
     for(i = 0; i < TAM; i++){
         for(j = 0; j < TAM; j++){
-            printf("%c%c ", terrenoLarg[i][j][0], terrenoLarg[i][j][1]);
+            if(i == inicio.x && j == inicio.y)
+                printf("I  ");
+            else if(i == destino.x && j == destino.y)
+                printf("F  ");
+            else
+                printf("%c%c ", terrenoLarg[i][j][0], terrenoLarg[i][j][1]);
         }
         printf("\n");
     }
@@ -278,7 +283,12 @@ void imprimeFinal(){
 
     for(i = 0; i < TAM; i++){
         for(j = 0; j < TAM; j++){
-            printf("%c%c ", terrenoUni[i][j][0], terrenoUni[i][j][1]);
+          if(i == inicio.x && j == inicio.y)
+              printf("I  ");
+          else if(i == destino.x && j == destino.y)
+              printf("F  ");
+          else
+              printf("%c%c ", terrenoUni[i][j][0], terrenoUni[i][j][1]);
         }
         printf("\n");
     }
