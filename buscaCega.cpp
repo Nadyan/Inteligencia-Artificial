@@ -44,6 +44,7 @@ void limpaTela();
 void initVisitados();
 void imprimeFinal();
 int bfs(int i, int j);
+int dfs(int i, int j);
 int uniforme(int i, int j);
 
 
@@ -160,11 +161,42 @@ void imprimeCenario(){
     }
 }
 
+int dfs(int i, int j){
+    terrenoChar[i][j][1] = '.';
+    visitados[i][j] = 1;
+
+    limpaTela();
+    printf("\nExecutando Busca em Profundidade:\n\n");
+    imprimeCenario();
+    usleep(1000*30);
+
+    if(i == destino.x && j == destino.y)
+        return 1;
+    else{
+        /* para cima */
+        if(i - 1 >= 0 && !visitados[i-1][j]){
+			      bfs(i-1, j);
+		    }
+        /* para a direita */
+        else if(j + 1 < TAM && !visitados[i][j+1]){
+			      bfs(i, j+1);
+		    }
+        /* para baixo */
+        else if(i + 1 < TAM && !visitados[i+1][j]){
+			      bfs(i+1, j);
+		    }
+        /* para a esquerda */
+        else if(j - 1 >= 0 && !visitados[i][j-1]){
+			      bfs(i, j-1);
+		    }
+    }
+}
+
 int bfs(int i, int j){
     terrenoChar[i][j][1] = '.';
     visitados[i][j] = 1;
 
-	/* TA ERRADO, ESSE É O DFS! TEM QUE FAZER BFS */
+    // insere no fim da lista
 
     qtdLarg++; // contagem de posicoes
     custoLarg += terreno[i][j];
@@ -178,21 +210,21 @@ int bfs(int i, int j){
         return 1;
     else{
         /* para cima */
-        if(i - 1 >= 0 && !visitados[i-1][j]){            
-			bfs(i-1, j);	
-		}
+        if(i - 1 >= 0 && !visitados[i-1][j]){
+            // remove do inicio da lista
+		    }
         /* para a direita */
-        else if(j + 1 < TAM && !visitados[i][j+1]){            
-			bfs(i, j+1);
-		}
+        else if(j + 1 < TAM && !visitados[i][j+1]){
+            // remove do inicio da lista
+		    }
         /* para baixo */
-        else if(i + 1 < TAM && !visitados[i+1][j]){           
-			bfs(i+1, j);
-		}
+        else if(i + 1 < TAM && !visitados[i+1][j]){
+            // remove do inicio da lista
+		    }
         /* para a esquerda */
-        else if(j - 1 >= 0 && !visitados[i][j-1]){           
-			bfs(i, j-1);
-		}
+        else if(j - 1 >= 0 && !visitados[i][j-1]){
+            // remove do inicio da lista
+		    }
     }
 }
 
