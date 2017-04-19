@@ -32,6 +32,8 @@ Ponto inicio, destino;
 int terreno[TAM][TAM];
 int visitados[TAM][TAM];
 char terrenoChar[TAM][TAM][2];
+char terrenoLarg[TAM][TAM][2];
+char terrenoUni[TAM][TAM][2];
 int qtdLarg = 0, qtdUni = 0, custoLarg = 0, custoUni = 0;
 
 /* Funcs */
@@ -39,12 +41,14 @@ void montaCenario();
 void imprimeCenario();
 void limpaTela();
 void initVisitados();
+void imprimeFinal();
 int bfs(int i, int j);
 int uniforme(int i, int j);
 
 
 int main(){
     int a; // retorno das funcs
+    int i, j;
 
     printf("Informe o ponto de inicio: ");
     scanf("%d %d", &inicio.x, &inicio.y);
@@ -58,13 +62,41 @@ int main(){
     printf("\nExecutando Busca Cega em Largura:\n\n");
     a = bfs(inicio.x, inicio.y);
 
+    /* Montagem da matriz de resultados largura */
+    for(i = 0; i < TAM; i++){
+        for(j = 0; j < TAM; j++){
+            if(terrenoChar[i][j][1] == '.'){
+                terrenoLarg[i][j][0] = terrenoChar[i][j][0];
+                terrenoLarg[i][j][1] = terrenoChar[i][j][1];
+            }else{
+                terrenoLarg[i][j][0] = ' ';
+                terrenoLarg[i][j][1] = ' ';
+            }
+        }
+    }
+
     initVisitados();
     montaCenario();
 
     printf("\n\nExecutando Busca Cega Uniforme:\n\n");
     a = uniforme(inicio.x, inicio.y);
-    
-    printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\nUniforme:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtdLarg, custoUni, qtdUni);
+
+    /* Montagem da matriz de resultados uniforme */
+    for(i = 0; i < TAM; i++){
+        for(j = 0; j < TAM; j++){
+            if(terrenoChar[i][j][1] == '.'){
+                terrenoUni[i][j][0] = terrenoChar[i][j][0];
+                terrenoUni[i][j][1] = terrenoChar[i][j][1];
+            }else{
+                terrenoUni[i][j][0] = ' ';
+                terrenoUni[i][j][1] = ' ';
+            }
+        }
+    }
+
+    limpaTela();
+    imprimeFinal();
+    //printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\nUniforme:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtdLarg, custoUni, qtdUni);
 
     // Interface grafica
     /*
@@ -130,7 +162,7 @@ void imprimeCenario(){
 int bfs(int i, int j){
     terrenoChar[i][j][1] = '.';
     visitados[i][j] = 1;
-    
+
     qtdLarg++; // contagem de posicoes
     custoLarg += terreno[i][j];
 
@@ -160,7 +192,7 @@ int bfs(int i, int j){
 int uniforme(int i, int j){
     int menor = 4; // para encontrar o menor
     int i2 = 42, j2 = 42;
-    
+
     qtdUni++; // contagem de posicoes
     custoUni += terreno[i][j];
 
@@ -188,7 +220,7 @@ int uniforme(int i, int j){
             if(terreno[i-1][j] < menor ){
                 i2 = i-1; j2 = j;
                 menor = terreno[i-1][j];
-            } 
+            }
         }
         /* se for para a direitra */
         if(j + 1 < TAM && !visitados[i][j+1]){
@@ -215,19 +247,43 @@ int uniforme(int i, int j){
             uniforme(i2, j2);
         else{
             printf("\n\nFalha na busca, caminho nao encontrado!\n\n");
-            return 1;   
+            return 1;
         }
     }
 }
 
 void initVisitados(){
     int i, j;
-    
+
     for(int i = 0; i < TAM; i++){
         for(int j = 0; j < TAM; j++){
             visitados[i][j] = 0;
         }
     }
+}
+
+void imprimeFinal(){
+    int i, j;
+
+    printf("\nCaminho percorrido pela busca em largura\n\n");
+
+    for(i = 0; i < TAM; i++){
+        for(j = 0; j < TAM; j++){
+            printf("%c%c ", terrenoLarg[i][j][0], terrenoLarg[i][j][1]);
+        }
+        printf("\n");
+    }
+
+    printf("\n\nCaminho percorrido pela busca de custo uniforme:\n\n");
+
+    for(i = 0; i < TAM; i++){
+        for(j = 0; j < TAM; j++){
+            printf("%c%c ", terrenoUni[i][j][0], terrenoUni[i][j][1]);
+        }
+        printf("\n");
+    }
+
+    printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\nUniforme:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtdLarg, custoUni, qtdUni);
 }
 
 void limpaTela(){
