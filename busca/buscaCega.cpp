@@ -11,7 +11,7 @@
 
   Compilar humildemente pra rodar no terminal:
   g++ -o buscaCega buscaCega.cpp Lista.c Lista.h
-  ./buscaCega 
+  ./buscaCega
 */
 
 /* Bibs */
@@ -49,7 +49,6 @@ void limpaTela();
 void initVisitados();
 void imprimeFinal();
 int bfs(int i, int j);
-int bfsRun();
 int dfs(int i, int j);
 int uniforme(int i, int j);
 
@@ -182,19 +181,19 @@ int dfs(int i, int j){
     else{
         /* para cima */
         if(i - 1 >= 0 && !visitados[i-1][j]){
-			      bfs(i-1, j);
+			      dfs(i-1, j);
 		    }
         /* para a direita */
         else if(j + 1 < TAM && !visitados[i][j+1]){
-			      bfs(i, j+1);
+			      dfs(i, j+1);
 		    }
         /* para baixo */
         else if(i + 1 < TAM && !visitados[i+1][j]){
-			      bfs(i+1, j);
+			      dfs(i+1, j);
 		    }
         /* para a esquerda */
         else if(j - 1 >= 0 && !visitados[i][j-1]){
-			      bfs(i, j-1);
+			      dfs(i, j-1);
 		    }
     }
 }
@@ -203,39 +202,41 @@ int bfs(int i, int j){
     terrenoChar[i][j][1] = '.';
     visitados[i][j] = 1;
 
-    // insere no fim da lista
+    // remove da cabeca
 
     qtdLarg++; // contagem de posicoes
     custoLarg += terreno[i][j];
 
-    limpaTela();
-    printf("\nExecutando Busca em Largura:\n\n");
-    imprimeCenario();
-    usleep(1000*30);
+    //limpaTela();
+    //printf("\nExecutando Busca em Largura:\n\n");
+    //imprimeCenario();
+    //usleep(1000*30);
 
     if(i == destino.x && j == destino.y)
         return 1;
     else{
         /* para cima */
         if(i - 1 >= 0 && !visitados[i-1][j]){
-            // remove do inicio da lista
+            // adiciona na cauda
+            // break
 		}
         /* para a direita */
         else if(j + 1 < TAM && !visitados[i][j+1]){
-            // remove do inicio da lista
+            // adiciona na cauda
+            // break
 		}
         /* para baixo */
         else if(i + 1 < TAM && !visitados[i+1][j]){
-            // remove do inicio da lista
-		}
+            // adiciona na cauda
+            // break
+        }
         /* para a esquerda */
         else if(j - 1 >= 0 && !visitados[i][j-1]){
-            // remove do inicio da lista
-		}
+            // adciona na cauda
+            // break
+        }
     }
-}
-/*
-int bfsRun(?){
+
     open = [e0]; //open contem a lista de nos a serem visitados
 
     while(open != vazia){
@@ -251,7 +252,7 @@ int bfsRun(?){
     }
     if(open == vazia)
         printf("Nao ha solucao\n");
-}*/
+}
 
 int uniforme(int i, int j){
     int menor = 4; // para encontrar o menor
