@@ -203,13 +203,8 @@ void bfs(int i, int j){
     Ponto paternidade[TAM][TAM];
     int qtd = 0;
 
-    //qtdLarg++; // contagem de posicoes
-    //custoLarg += terreno[i][j];
-
-    //limpaTela();
-    //printf("\nExecutando Busca em Largura:\n\n");
-    //imprimeCenario();
-    //usleep(1000*30);
+    limpaTela();
+    printf("\nExecutando Busca em Largura:\n\n");
 
     visitados[i][j] = 1;
 
@@ -318,6 +313,8 @@ void bfs(int i, int j){
     Ponto cam = destino;
     while(paternidade[cam.x][cam.y].paix != -1 && paternidade[cam.x][cam.y].paiy != -1){
         terrenoLarg[cam.x][cam.y][1] = '.';
+        custoLarg += terreno[cam.x][cam.y];
+
         cam.x = paternidade[cam.x][cam.y].paix;
         cam.y = paternidade[cam.x][cam.y].paiy;
     }
@@ -328,24 +325,71 @@ void bfs(int i, int j){
     for(int i = 0; i < TAM; i++){
         for(int j = 0; j < TAM; j++){
             if(i == inicio.x && j == inicio.y)
-                printf("I  ");
+                printf("In ");
             else if(i == destino.x && j == destino.y)
-                printf("F  ");
+                printf("Fi ");
             else
                 printf("%c%c ", terrenoLarg[i][j][0], terrenoLarg[i][j][1]);
         }
         printf("\n");
     }
+
+    printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\n%d %d\n\n", custoLarg, qtd);//, paternidade[21][25].paix, paternidade[20][25].paiy);
 }
 
 void uniforme(int i, int j){
-    //qtdUni++; // contagem de posicoes
-    //custoUni += terreno[i][j];
+    Ponto paternidade[TAM][TAM];
+    int qtd = 0, custo = 4;
+
+    qtdUni++; // contagem de posicoes
+
+    limpaTela();
+    printf("\nExecutando Busca de custo Uniforme:\n\n");
+
+    visitados[i][j] = 1;
 
     Ponto inicio;
     inicio.x = i; inicio.y = j;
+    paternidade[inicio.x][inicio.y].paix = -1;  // no raiz
+    paternidade[inicio.x][inicio.y].paiy = -1;  // no raiz
 
     lista.push_front(inicio);
+
+    while(!lista.empty()){
+        Ponto p = lista.front();
+        Ponto pnovo;
+        lista.pop_front();
+
+        /* Encontrar o vizinho de menor custo */
+        /* Cima */
+        if(p.x - 1 >= 0 && !visitados[p.x-1][p.y] && terreno[p.x-1][p.y] < custo){
+            custo = terreno[p.x-1][p.y];
+            pnovo.x = p.x-1;
+            pnovo.y = p.y;
+        }
+        /* Direita */
+        if(p.y + 1 < TAM && visitados[p.x][p.y+1] && terreno[p.x][p.y+1] < custo){
+            custo = terreno[p.x][p.y+1];
+            pnovo.x = p.x;
+            pnovo.y = p.y+1;
+        }
+        /* Baixo */
+        if(p.x + 1 < TAM && !visitados[p.x+1][p.y] && terreno[p.x+1][p.y] < custo){
+            custo = terreno[p.x+1][p.y];
+            pnovo.x = p.x+1;
+            pnovo.y = p.y;
+        }
+        /* Esquerda */
+        if(p.y - 1 >= 0 && !visitados[p.x][p.y-1] && terreno[p.x][p.y-1] < custo){
+            custo = 4; // reinicia o custo
+            pnovo.x = p.x;
+            pnovo.y = p.y-1;
+        }
+
+        visitados[pnovo.x][pnovo.y] = 1;
+
+        /* linha 93 do dijkstra (for) */
+    }
 
 
 }
