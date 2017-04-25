@@ -10,7 +10,7 @@
   ./buscaCega
 
   Compilar humildemente pra rodar no terminal:
-  g++ -o buscaCega buscaCega.cpp Lista.c Lista.h
+  g++ -o buscaCega buscaCega.cpp
   ./buscaCega
 */
 
@@ -21,7 +21,6 @@
 #include <unistd.h>
 #include <time.h>
 #include <list>
-//#include "Lista.h"
 //#include <SFML/Graphics.hpp>
 
 /* Defs */
@@ -71,7 +70,7 @@ int main(){
     bfs(inicio.x, inicio.y);
 
     /* Montagem da matriz de resultados largura */
-    for(i = 0; i < TAM; i++){
+    /*for(i = 0; i < TAM; i++){
         for(j = 0; j < TAM; j++){
             if(terrenoChar[i][j][1] == '.'){
                 terrenoLarg[i][j][0] = terrenoChar[i][j][0];
@@ -81,7 +80,7 @@ int main(){
                 terrenoLarg[i][j][1] = ' ';
             }
         }
-    }
+    }*/
 /*
     initVisitados();
     montaCenario();
@@ -182,26 +181,23 @@ int dfs(int i, int j){
         /* para cima */
         if(i - 1 >= 0 && !visitados[i-1][j]){
 			      dfs(i-1, j);
-		    }
+		}
         /* para a direita */
         else if(j + 1 < TAM && !visitados[i][j+1]){
 			      dfs(i, j+1);
-		    }
+		}
         /* para baixo */
         else if(i + 1 < TAM && !visitados[i+1][j]){
 			      dfs(i+1, j);
-		    }
+		}
         /* para a esquerda */
         else if(j - 1 >= 0 && !visitados[i][j-1]){
 			      dfs(i, j-1);
-		    }
+		}
     }
 }
 
 void bfs(int i, int j){
-    terrenoChar[i][j][1] = '.';
-    visitados[i][j] = 1;
-
     //qtdLarg++; // contagem de posicoes
     //custoLarg += terreno[i][j];
 
@@ -220,7 +216,7 @@ void bfs(int i, int j){
         lista.pop_front();
 
         /* cima */
-        if(p.x - 1 >= 0){
+        if(p.x - 1 >= 0 && !visitados[p.x-1][p.y]){
             Ponto pnovo;
             pnovo.x = p.x - 1;
             pnovo.y = p.y;
@@ -228,23 +224,35 @@ void bfs(int i, int j){
 
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
-            else
+            else{
                 lista.push_back(pnovo);
+                terrenoChar[pnovo.x][pnovo.y][1] = '.';
+                visitados[pnovo.x][pnovo.y] = 1;
+                limpaTela();
+                imprimeCenario();
+                usleep(1000*30);
+            }
         }
         /* direita */
-        if(p.y < TAM){
+        if(p.y < TAM && !visitados[p.x][p.y+1]){
             Ponto pnovo;
             pnovo.x = p.x;
-            pnovo.y = p.y - 1;
+            pnovo.y = p.y + 1;
             pnovo.paix = p.x; pnovo.paiy = p.y;
 
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
-            else
+            else{
                 lista.push_back(pnovo);
+                terrenoChar[pnovo.x][pnovo.y][1] = '.';
+                visitados[pnovo.x][pnovo.y] = 1;
+                limpaTela();
+                imprimeCenario();
+                usleep(1000*30);
+            }
         }
         /* baixo */
-        if(p.x + 1 < TAM){
+        if(p.x + 1 < TAM && !visitados[p.x+1][p.y]){
             Ponto pnovo;
             pnovo.x = p.x + 1;
             pnovo.y = p.y;
@@ -252,11 +260,17 @@ void bfs(int i, int j){
 
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
-            else
+            else{
                 lista.push_back(pnovo);
+                terrenoChar[pnovo.x][pnovo.y][1] = '.';
+                visitados[pnovo.x][pnovo.y] = 1;
+                limpaTela();
+                imprimeCenario();
+                usleep(1000*30);
+            }
         }
         /* esquerda */
-        if(p.y - 1 >= 0){
+        if(p.y - 1 >= 0 && !visitados[p.x][p.y-1]){
             Ponto pnovo;
             pnovo.x = p.x;
             pnovo.y = p.y - 1;
@@ -264,8 +278,14 @@ void bfs(int i, int j){
 
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
-            else
+            else{
                 lista.push_back(pnovo);
+                terrenoChar[pnovo.x][pnovo.y][1] = '.';
+                visitados[pnovo.x][pnovo.y] = 1;
+                limpaTela();
+                imprimeCenario();
+                usleep(1000*30);
+            }
         }
     }
 }
