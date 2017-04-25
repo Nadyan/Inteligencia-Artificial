@@ -20,7 +20,8 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <time.h>
-#include "Lista.h"
+#include <list>
+//#include "Lista.h"
 //#include <SFML/Graphics.hpp>
 
 /* Defs */
@@ -30,10 +31,11 @@
 typedef struct{
     int x;
     int y;
+    int paix = -1, paiy = -1;
 }Ponto;
 
 /* Vars */
-Lista lista;
+std::list<Ponto> lista;
 Ponto inicio, destino;
 int terreno[TAM][TAM];
 int visitados[TAM][TAM];
@@ -48,13 +50,12 @@ void imprimeCenario();
 void limpaTela();
 void initVisitados();
 void imprimeFinal();
-int bfs(int i, int j);
+void bfs(int i, int j);
 int dfs(int i, int j);
 int uniforme(int i, int j);
 
 
 int main(){
-    int a; // retorno das funcs
     int i, j;
 
     printf("Informe o ponto de inicio: ");
@@ -62,13 +63,12 @@ int main(){
     printf("Informe o ponto de destino: ");
     scanf("%d %d", &destino.x, &destino.y);
 
-    inicializa_lista(&lista, sizeof(Ponto));
     initVisitados();
     montaCenario();
     limpaTela();
 
     printf("\nExecutando Busca em Largura:\n\n");
-    a = bfs(inicio.x, inicio.y);
+    bfs(inicio.x, inicio.y);
 
     /* Montagem da matriz de resultados largura */
     for(i = 0; i < TAM; i++){
@@ -198,60 +198,76 @@ int dfs(int i, int j){
     }
 }
 
-int bfs(int i, int j){
+void bfs(int i, int j){
     terrenoChar[i][j][1] = '.';
     visitados[i][j] = 1;
 
-    // remove da cabeca
-
-    qtdLarg++; // contagem de posicoes
-    custoLarg += terreno[i][j];
+    //qtdLarg++; // contagem de posicoes
+    //custoLarg += terreno[i][j];
 
     //limpaTela();
     //printf("\nExecutando Busca em Largura:\n\n");
     //imprimeCenario();
     //usleep(1000*30);
 
-    if(i == destino.x && j == destino.y)
-        return 1;
-    else{
-        /* para cima */
-        if(i - 1 >= 0 && !visitados[i-1][j]){
-            // adiciona na cauda
-            // break
-		}
-        /* para a direita */
-        else if(j + 1 < TAM && !visitados[i][j+1]){
-            // adiciona na cauda
-            // break
-		}
-        /* para baixo */
-        else if(i + 1 < TAM && !visitados[i+1][j]){
-            // adiciona na cauda
-            // break
+    Ponto inicio;
+    inicio.x = i; inicio.y = j;
+
+    lista.push_front(inicio);
+
+    while(!lista.empty()){
+        Ponto p = lista.front();
+        lista.pop_front();
+
+        /* cima */
+        if(p.x - 1 >= 0){
+            Ponto pnovo;
+            pnovo.x = p.x - 1;
+            pnovo.y = p.y;
+            pnovo.paix = p.x; pnovo.paiy = p.y;
+
+            if(pnovo.x == destino.x && pnovo.y == destino.y)
+                break;
+            else
+                lista.push_back(pnovo);
         }
-        /* para a esquerda */
-        else if(j - 1 >= 0 && !visitados[i][j-1]){
-            // adciona na cauda
-            // break
+        /* direita */
+        if(p.y < TAM){
+            Ponto pnovo;
+            pnovo.x = p.x;
+            pnovo.y = p.y - 1;
+            pnovo.paix = p.x; pnovo.paiy = p.y;
+
+            if(pnovo.x == destino.x && pnovo.y == destino.y)
+                break;
+            else
+                lista.push_back(pnovo);
+        }
+        /* baixo */
+        if(p.x + 1 < TAM){
+            Ponto pnovo;
+            pnovo.x = p.x + 1;
+            pnovo.y = p.y;
+            pnovo.paix = p.x; pnovo.paiy = p.y;
+
+            if(pnovo.x == destino.x && pnovo.y == destino.y)
+                break;
+            else
+                lista.push_back(pnovo);
+        }
+        /* esquerda */
+        if(p.y - 1 >= 0){
+            Ponto pnovo;
+            pnovo.x = p.x;
+            pnovo.y = p.y - 1;
+            pnovo.paix = p.x; pnovo.y = p.y;
+
+            if(pnovo.x == destino.x && pnovo.y == destino.y)
+                break;
+            else
+                lista.push_back(pnovo);
         }
     }
-
-    open = [e0]; //open contem a lista de nos a serem visitados
-
-    while(open != vazia){
-        e = primeiroElementoDeOpen;
-        open = removePrimeiroElemento;
-
-        for(i = 0; todo ri em R tal que ri(e) em E){ // determina todos os sucessores de e
-            eLinha = ri(e); // e os coloca em open
-            if(eLinha é nó final)
-                return eLinha;
-            open = insereNoFim(eLinha)
-        }
-    }
-    if(open == vazia)
-        printf("Nao ha solucao\n");
 }
 
 int uniforme(int i, int j){
