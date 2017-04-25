@@ -51,8 +51,8 @@ void initVisitados();
 void imprimeFinal();
 void bfs(int i, int j);
 int dfs(int i, int j);
-int uniforme(int i, int j);
-
+void uniforme(int i, int j);
+int buscaGulosa(int i, int j);
 
 int main(){
     int i, j;
@@ -81,12 +81,12 @@ int main(){
             }
         }
     }*/
-/*
-    initVisitados();
-    montaCenario();
 
-    printf("\n\nExecutando Busca Cega Uniforme:\n\n");
-    a = uniforme(inicio.x, inicio.y);
+    //initVisitados();
+    //montaCenario();
+
+    //printf("\n\nExecutando Busca Cega Uniforme:\n\n");
+    //uniforme(inicio.x, inicio.y);
 
     /* Montagem da matriz de resultados uniforme */
   /*  for(i = 0; i < TAM; i++){
@@ -144,6 +144,8 @@ void montaCenario(){
                 case 3:
                     terrenoChar[i][j][0] = '3'; terrenoChar[i][j][1] = ' '; break;
             }
+            terrenoLarg[i][j][0] = terrenoChar[i][j][0];
+            terrenoLarg[i][j][1] = terrenoChar[i][j][1];
         }
     }
 }
@@ -198,6 +200,9 @@ int dfs(int i, int j){
 }
 
 void bfs(int i, int j){
+    Ponto paternidade[TAM][TAM];
+    int qtd = 0;
+
     //qtdLarg++; // contagem de posicoes
     //custoLarg += terreno[i][j];
 
@@ -222,9 +227,12 @@ void bfs(int i, int j){
             pnovo.y = p.y;
             pnovo.paix = p.x; pnovo.paiy = p.y;
 
+            paternidade[pnovo.x][pnovo.y] = p;
+
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
             else{
+                qtd++;
                 lista.push_back(pnovo);
                 terrenoChar[pnovo.x][pnovo.y][1] = '.';
                 visitados[pnovo.x][pnovo.y] = 1;
@@ -240,9 +248,12 @@ void bfs(int i, int j){
             pnovo.y = p.y + 1;
             pnovo.paix = p.x; pnovo.paiy = p.y;
 
+            paternidade[pnovo.x][pnovo.y] = p;
+
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
             else{
+                qtd++;
                 lista.push_back(pnovo);
                 terrenoChar[pnovo.x][pnovo.y][1] = '.';
                 visitados[pnovo.x][pnovo.y] = 1;
@@ -258,9 +269,12 @@ void bfs(int i, int j){
             pnovo.y = p.y;
             pnovo.paix = p.x; pnovo.paiy = p.y;
 
+            paternidade[pnovo.x][pnovo.y] = p;
+
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
             else{
+                qtd++;
                 lista.push_back(pnovo);
                 terrenoChar[pnovo.x][pnovo.y][1] = '.';
                 visitados[pnovo.x][pnovo.y] = 1;
@@ -276,6 +290,126 @@ void bfs(int i, int j){
             pnovo.y = p.y - 1;
             pnovo.paix = p.x; pnovo.y = p.y;
 
+            paternidade[pnovo.x][pnovo.y] = p;
+
+            if(pnovo.x == destino.x && pnovo.y == destino.y)
+                break;
+            else{
+                qtd++;
+                lista.push_back(pnovo);
+                terrenoChar[pnovo.x][pnovo.y][1] = '.';
+                visitados[pnovo.x][pnovo.y] = 1;
+                limpaTela();
+                imprimeCenario();
+                usleep(1000*30);
+            }
+        }
+    }
+
+    // caminho
+    /*
+    Ponto fim = lista.front();
+    while(fim.paix != -1 && fim.paiy != -1){
+        terrenoLarg[fim.paix][fim.paiy][1] = '.';
+        fim.x = fim.paix;
+        fim.y = fim.paiy;
+    }
+
+    limpaTela();
+    printf("\n\n");
+
+    for(int i = 0; i < TAM; i++){
+        for(int j = 0; j < TAM; j++){
+            if(i == inicio.x && j == inicio.y)
+                printf("I  ");
+            else if(i == destino.x && j == destino.y)
+                printf("F  ");
+            else
+                printf("%c%c ", terrenoLarg[i][j][0], terrenoLarg[i][j][1]);
+        }
+        printf("\n");
+    } */
+}
+
+void uniforme(int i, int j){
+    //qtdUni++; // contagem de posicoes
+    //custoUni += terreno[i][j];
+
+    Ponto inicio;
+    inicio.x = i; inicio.y = j;
+
+    lista.push_front(inicio);
+
+    while(!lista.empty()){
+        int menor = 4;
+        Ponto p = lista.front();
+        lista.pop_front();
+
+        /* cima */
+        if(p.x - 1 >= 0 && !visitados[p.x-1][p.y] && terreno[p.x-1][p.y] < menor){
+            Ponto pnovo;
+            pnovo.x = p.x - 1;
+            pnovo.y = p.y;
+            pnovo.paix = p.x; pnovo.paiy = p.y;
+            menor = terreno[p.x-1][p.y];
+
+            if(pnovo.x == destino.x && pnovo.y == destino.y)
+                break;
+            else{
+                lista.push_back(pnovo);
+                terrenoChar[pnovo.x][pnovo.y][1] = '.';
+                visitados[pnovo.x][pnovo.y] = 1;
+                limpaTela();
+                imprimeCenario();
+                usleep(1000*30);
+            }
+        }
+        /* direita */
+        if(p.y < TAM && !visitados[p.x][p.y+1] && terreno[p.x][p.y+1] < menor){
+            Ponto pnovo;
+            pnovo.x = p.x;
+            pnovo.y = p.y + 1;
+            pnovo.paix = p.x; pnovo.paiy = p.y;
+            menor = terreno[p.x][p.y+1];
+
+            if(pnovo.x == destino.x && pnovo.y == destino.y)
+                break;
+            else{
+                lista.push_back(pnovo);
+                terrenoChar[pnovo.x][pnovo.y][1] = '.';
+                visitados[pnovo.x][pnovo.y] = 1;
+                limpaTela();
+                imprimeCenario();
+                usleep(1000*30);
+            }
+        }
+        /* baixo */
+        if(p.x + 1 < TAM && !visitados[p.x+1][p.y] && terreno[p.x+1][p.y] < menor){
+            Ponto pnovo;
+            pnovo.x = p.x + 1;
+            pnovo.y = p.y;
+            pnovo.paix = p.x; pnovo.paiy = p.y;
+            menor = terreno[p.x+1][p.y];
+
+            if(pnovo.x == destino.x && pnovo.y == destino.y)
+                break;
+            else{
+                lista.push_back(pnovo);
+                terrenoChar[pnovo.x][pnovo.y][1] = '.';
+                visitados[pnovo.x][pnovo.y] = 1;
+                limpaTela();
+                imprimeCenario();
+                usleep(1000*30);
+            }
+        }
+        /* esquerda */
+        if(p.y - 1 >= 0 && !visitados[p.x][p.y-1] && terreno[p.x][p.y-1] < menor){
+            Ponto pnovo;
+            pnovo.x = p.x;
+            pnovo.y = p.y - 1;
+            pnovo.paix = p.x; pnovo.y = p.y;
+            menor = terreno[p.x][p.y-1];
+
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
             else{
@@ -290,7 +424,8 @@ void bfs(int i, int j){
     }
 }
 
-int uniforme(int i, int j){
+
+int buscaGulosa(int i, int j){
     int menor = 4; // para encontrar o menor
     int i2 = 42, j2 = 42;
 
@@ -308,7 +443,7 @@ int uniforme(int i, int j){
     visitados[i][j] = 1;
 
     limpaTela();
-    printf("\n\nExecutando Busca Cega Uniforme:\n\n");
+    printf("\n\nExecutando Busca Cega Gulosa:\n\n");
     imprimeCenario();
     usleep(1000*30);
 
