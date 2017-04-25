@@ -215,7 +215,8 @@ void bfs(int i, int j){
 
     Ponto inicio;
     inicio.x = i; inicio.y = j;
-    inicio.paix = -1; inicio.paiy = -1; // nó raiz
+    paternidade[inicio.x][inicio.y].paix = -1;  // no raiz
+    paternidade[inicio.x][inicio.y].paiy = -1;  // no raiz
 
     lista.push_front(inicio);
 
@@ -296,8 +297,8 @@ void bfs(int i, int j){
             pnovo.y = p.y - 1;
             pnovo.paix = p.x; pnovo.paiy = p.y;
 
-            paternidade[pnovo.x][pnovo.y].paix = p.x;
-            paternidade[pnovo.x][pnovo.y].paiy = p.y;
+            paternidade[pnovo.x][pnovo.y].paix = p.x; paternidade[pnovo.x][pnovo.y].paiy = p.y;
+            paternidade[pnovo.x][pnovo.y].x = p.x; paternidade[pnovo.x][pnovo.y].y = p.y-1;
 
             if(pnovo.x == destino.x && pnovo.y == destino.y)
                 break;
@@ -314,12 +315,11 @@ void bfs(int i, int j){
     }
 
     // caminho
-    Ponto fim;
-    fim.paix = destino.paix; fim.paiy = destino.paiy;
-    while(fim.paix != -1 && fim.paiy != -1){ // enquanto nao chegar na origem
-        terrenoLarg[fim.paix][fim.paiy][1] = '.';
-        fim.x = fim.paix;
-        fim.y = fim.paiy;
+    Ponto cam = destino;
+    while(paternidade[cam.x][cam.y].paix != -1 && paternidade[cam.x][cam.y].paiy != -1){
+        terrenoLarg[cam.x][cam.y][1] = '.';
+        cam.x = paternidade[cam.x][cam.y].paix;
+        cam.y = paternidade[cam.x][cam.y].paiy;
     }
 
     limpaTela();
@@ -347,89 +347,7 @@ void uniforme(int i, int j){
 
     lista.push_front(inicio);
 
-    while(!lista.empty()){
-        int menor = 4;
-        Ponto p = lista.front();
-        lista.pop_front();
 
-        if(p.y - 1 >= 0 && !visitados[p.x][p.y-1] && terreno[p.x][p.y-1] < menor){
-            Ponto pnovo;
-            pnovo.x = p.x;
-            pnovo.y = p.y - 1;
-            pnovo.paix = p.x; pnovo.y = p.y;
-            menor = terreno[p.x][p.y-1];
-
-            if(pnovo.x == destino.x && pnovo.y == destino.y)
-                break;
-            else{
-                lista.push_back(pnovo);
-                terrenoChar[pnovo.x][pnovo.y][1] = '.';
-                visitados[pnovo.x][pnovo.y] = 1;
-                limpaTela();
-                imprimeCenario();
-                usleep(1000*30);
-            }
-        }
-        /* cima */
-        if(p.x - 1 >= 0 && !visitados[p.x-1][p.y] && terreno[p.x-1][p.y] < menor){
-            Ponto pnovo;
-            pnovo.x = p.x - 1;
-            pnovo.y = p.y;
-            pnovo.paix = p.x; pnovo.paiy = p.y;
-            menor = terreno[p.x-1][p.y];
-
-            if(pnovo.x == destino.x && pnovo.y == destino.y)
-                break;
-            else{
-                lista.push_back(pnovo);
-                terrenoChar[pnovo.x][pnovo.y][1] = '.';
-                visitados[pnovo.x][pnovo.y] = 1;
-                limpaTela();
-                imprimeCenario();
-                usleep(1000*30);
-            }
-        }
-        /* direita */
-        if(p.y < TAM && !visitados[p.x][p.y+1] && terreno[p.x][p.y+1] < menor){
-            Ponto pnovo;
-            pnovo.x = p.x;
-            pnovo.y = p.y + 1;
-            pnovo.paix = p.x; pnovo.paiy = p.y;
-            menor = terreno[p.x][p.y+1];
-
-            if(pnovo.x == destino.x && pnovo.y == destino.y)
-                break;
-            else{
-                lista.push_back(pnovo);
-                terrenoChar[pnovo.x][pnovo.y][1] = '.';
-                visitados[pnovo.x][pnovo.y] = 1;
-                limpaTela();
-                imprimeCenario();
-                usleep(1000*30);
-            }
-        }
-        /* baixo */
-        if(p.x + 1 < TAM && !visitados[p.x+1][p.y] && terreno[p.x+1][p.y] < menor){
-            Ponto pnovo;
-            pnovo.x = p.x + 1;
-            pnovo.y = p.y;
-            pnovo.paix = p.x; pnovo.paiy = p.y;
-            menor = terreno[p.x+1][p.y];
-
-            if(pnovo.x == destino.x && pnovo.y == destino.y)
-                break;
-            else{
-                lista.push_back(pnovo);
-                terrenoChar[pnovo.x][pnovo.y][1] = '.';
-                visitados[pnovo.x][pnovo.y] = 1;
-                limpaTela();
-                imprimeCenario();
-                usleep(1000*30);
-            }
-        }
-        /* esquerda */
-
-    }
 }
 
 
