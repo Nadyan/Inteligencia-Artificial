@@ -25,6 +25,7 @@
 
 /* Defs */
 #define TAM 42  //terreno TAMxTAM
+#define INFINITO 99999 // para a busca uniforme
 
 /* struct para os pontos de origem e destino */
 typedef struct{
@@ -35,9 +36,12 @@ typedef struct{
 
 /* Vars */
 std::list<Ponto> lista;
+std::list<Ponto> listaUniforme;
 Ponto origem, destino;
 int terreno[TAM][TAM];
+int terrenoCusto[TAM][TAM];
 int visitados[TAM][TAM];
+int distancia[TAM][TAM];
 char terrenoChar[TAM][TAM][2];
 char terrenoLarg[TAM][TAM][2];
 char terrenoUni[TAM][TAM][2];
@@ -53,6 +57,7 @@ void bfs(int i, int j);
 int dfs(int i, int j);
 void uniforme(int i, int j);
 int buscaGulosa(int i, int j);
+Ponto buscaMenor();
 
 int main(){
     int i, j;
@@ -66,8 +71,10 @@ int main(){
     montaCenario();
     limpaTela();
 
-    printf("\nExecutando Busca em Largura:\n\n");
-    bfs(origem.x, origem.y);
+    //printf("\nExecutando Busca em Largura:\n\n");
+    //bfs(origem.x, origem.y);
+
+    uniforme(origem.x, origem.y);
 
     /* Montagem da matriz de resultados largura */
     /*for(i = 0; i < TAM; i++){
@@ -136,16 +143,26 @@ void montaCenario(){
 
             switch(terreno[i][j]){
                 case 0:
-                    terrenoChar[i][j][0] = '0'; terrenoChar[i][j][1] = ' '; break;
+                    terrenoChar[i][j][0] = '0'; terrenoChar[i][j][1] = ' ';
+                    terrenoCusto[i][j] = 1;
+                    break;
                 case 1:
-                    terrenoChar[i][j][0] = '1'; terrenoChar[i][j][1] = ' '; break;
+                    terrenoChar[i][j][0] = '1'; terrenoChar[i][j][1] = ' ';
+                    terrenoCusto[i][j] = 5;
+                    break;
                 case 2:
-                    terrenoChar[i][j][0] = '2'; terrenoChar[i][j][1] = ' '; break;
+                    terrenoChar[i][j][0] = '2'; terrenoChar[i][j][1] = ' ';
+                    terrenoCusto[i][j] = 10;
+                    break;
                 case 3:
-                    terrenoChar[i][j][0] = '3'; terrenoChar[i][j][1] = ' '; break;
+                    terrenoChar[i][j][0] = '3'; terrenoChar[i][j][1] = ' ';
+                    terrenoCusto[i][j] = 15;
+                    break;
             }
             terrenoLarg[i][j][0] = terrenoChar[i][j][0];
             terrenoLarg[i][j][1] = terrenoChar[i][j][1];
+            terrenoUni[i][j][0] = terrenoChar[i][j][0];
+            terrenoUni[i][j][1] = terrenoChar[i][j][1];
         }
     }
 }
@@ -313,7 +330,7 @@ void bfs(int i, int j){
     Ponto cam = destino;
     while(paternidade[cam.x][cam.y].paix != -1 && paternidade[cam.x][cam.y].paiy != -1){
         terrenoLarg[cam.x][cam.y][1] = '.';
-        custoLarg += terreno[cam.x][cam.y];
+        custoLarg += terrenoCusto[cam.x][cam.y];
 
         cam.x = paternidade[cam.x][cam.y].paix;
         cam.y = paternidade[cam.x][cam.y].paiy;
@@ -334,64 +351,105 @@ void bfs(int i, int j){
         printf("\n");
     }
 
-    printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\n%d %d\n\n", custoLarg, qtd);//, paternidade[21][25].paix, paternidade[20][25].paiy);
+    printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtd);//, paternidade[21][25].paix, paternidade[20][25].paiy);
 }
 
 void uniforme(int i, int j){
-    Ponto paternidade[TAM][TAM];
-    int qtd = 0, custo = 4;
+    Ponto paternidade[TAM][TAM], inicio;
+    int qtd = 0;
 
-    qtdUni++; // contagem de posicoes
+    for(int k = 0; k < TAM; k++){
+        for(int l = 0; l < TAM; l++){
+            if(k == i && l == j)
+                distancia[k][l] = terrenoCusto[k][l];
+            else
+                distancia[k][l] = -1;
+        }
+    }
+
+    inicio.x = i; inicio.y = j;
+    paternidade[inicio.x][inicio.y].paix = -1;
+    paternidade[inicio.x][inicio.y].paiy = -1;
 
     limpaTela();
     printf("\nExecutando Busca de custo Uniforme:\n\n");
 
-    visitados[i][j] = 1;
+    while(1){
+        Ponto p = buscaMenor();
 
-    Ponto inicio;
-    inicio.x = i; inicio.y = j;
-    paternidade[inicio.x][inicio.y].paix = -1;  // no raiz
-    paternidade[inicio.x][inicio.y].paiy = -1;  // no raiz
+        visitados[p.x][p.y] = 1; // marca p como visitado
 
-    lista.push_front(inicio);
+        if(p.x == destino.x && p.y == destino.y)// verificar se p = fim, se sim break
+            break;
 
-    while(!lista.empty()){
-        Ponto p = lista.front();
-        Ponto pnovo;
-        lista.pop_front();
-
-        /* Encontrar o vizinho de menor custo */
+        /* Calcula as distancias dos vizinhos */
         /* Cima */
-        if(p.x - 1 >= 0 && !visitados[p.x-1][p.y] && terreno[p.x-1][p.y] < custo){
-            custo = terreno[p.x-1][p.y];
-            pnovo.x = p.x-1;
-            pnovo.y = p.y;
+        if(p.x-1 <= 0 && (distancia[p.x-1][p.y] < distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y]) && !visitados[p.x-1][p.y]){
+            distancia[p.x-1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y];
+            terrenoChar[p.x-1][p.y][1] = '.'; limpaTela(); imprimeCenario(); usleep(1000*20);
+            paternidade[p.x-1][p.y].paix = p.x; paternidade[p.x-1][p.y].paiy = p.y;
         }
         /* Direita */
-        if(p.y + 1 < TAM && visitados[p.x][p.y+1] && terreno[p.x][p.y+1] < custo){
-            custo = terreno[p.x][p.y+1];
-            pnovo.x = p.x;
-            pnovo.y = p.y+1;
+        if(p.y+1 < TAM && (distancia[p.x][p.y+1] < distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1]) && !visitados[p.x][p.y+1]){
+            distancia[p.x][p.y+1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1];
+            terrenoChar[p.x][p.y+1][1] = '.'; limpaTela(); imprimeCenario(); usleep(1000*20);
+            paternidade[p.x][p.y+1].paix = p.x; paternidade[p.x][p.y+1].paiy = p.y;
         }
         /* Baixo */
-        if(p.x + 1 < TAM && !visitados[p.x+1][p.y] && terreno[p.x+1][p.y] < custo){
-            custo = terreno[p.x+1][p.y];
-            pnovo.x = p.x+1;
-            pnovo.y = p.y;
+        if(p.x+1 < TAM && (distancia[p.x+1][p.y] < distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y]) && !visitados[p.x+1][p.y]){
+            distancia[p.x+1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y];
+            terrenoChar[p.x+1][p.y][1] = '.'; limpaTela(); imprimeCenario(); usleep(1000*20);
+            paternidade[p.x+1][p.y].paix = p.x; paternidade[p.x+1][p.y].paiy = p.y;
         }
         /* Esquerda */
-        if(p.y - 1 >= 0 && !visitados[p.x][p.y-1] && terreno[p.x][p.y-1] < custo){
-            custo = 4; // reinicia o custo
-            pnovo.x = p.x;
-            pnovo.y = p.y-1;
+        if(p.y-1 >= 0 && (distancia[p.x][p.y-1] < distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1]) && !visitados[p.x][p.y-1]){
+            distancia[p.x][p.y-1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1];
+            terrenoChar[p.x][p.y-1][1] = '.'; limpaTela(); imprimeCenario(); usleep(1000*20);
+            paternidade[p.x][p.y-1].paix = p.x; paternidade[p.x][p.y-1].paiy = p.y;
         }
-
-        visitados[pnovo.x][pnovo.y] = 1;
-
-        /* linha 93 do dijkstra (for) */
     }
 
+    // caminho
+    Ponto cam = destino;
+    while(paternidade[cam.x][cam.y].paix != -1 && paternidade[cam.x][cam.y].paiy != -1){
+        terrenoUni[cam.x][cam.y][1] = '.';
+        custoUni += terrenoCusto[cam.x][cam.y];
 
+        cam.x = paternidade[cam.x][cam.y].paix;
+        cam.y = paternidade[cam.x][cam.y].paiy;
+    }
+
+    limpaTela();
+    printf("\n\n");
+
+    for(int i = 0; i < TAM; i++){
+        for(int j = 0; j < TAM; j++){
+            if(i == inicio.x && j == inicio.y)
+                printf("In ");
+            else if(i == destino.x && j == destino.y)
+                printf("Fi ");
+            else
+                printf("%c%c ", terrenoUni[i][j][0], terrenoUni[i][j][1]);
+        }
+        printf("\n");
+    }
+}
+
+
+Ponto buscaMenor(){
+        int i, j, min = INFINITO;
+        Ponto menor;
+
+        for(i = 0; i < TAM; i++){
+            for(j = 0; j < TAM; j++){
+                if(distancia[i][j] != -1 && distancia[i][j] < min){
+                    min = distancia[i][j];
+                    menor.x = i;
+                    menor.y = j;
+                }
+            }
+        }
+        return menor;
 }
 
 
