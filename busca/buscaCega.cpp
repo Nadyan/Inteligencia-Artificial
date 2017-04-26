@@ -83,42 +83,7 @@ int main(){
     printf("\nExecutando Busca Uniforme:\n\n");
     uniforme(origem.x, origem.y);
 
-    /* Montagem da matriz de resultados largura */
-    /*for(i = 0; i < TAM; i++){
-        for(j = 0; j < TAM; j++){
-            if(terrenoChar[i][j][1] == '.'){
-                terrenoLarg[i][j][0] = terrenoChar[i][j][0];
-                terrenoLarg[i][j][1] = terrenoChar[i][j][1];
-            }else{
-                terrenoLarg[i][j][0] = ' ';
-                terrenoLarg[i][j][1] = ' ';
-            }
-        }
-    }*/
 
-    //initVisitados();
-    //montaCenario();
-
-    //printf("\n\nExecutando Busca Cega Uniforme:\n\n");
-    //uniforme(inicio.x, inicio.y);
-
-    /* Montagem da matriz de resultados uniforme */
-  /*  for(i = 0; i < TAM; i++){
-        for(j = 0; j < TAM; j++){
-            if(terrenoChar[i][j][1] == '.'){
-                terrenoUni[i][j][0] = terrenoChar[i][j][0];
-                terrenoUni[i][j][1] = terrenoChar[i][j][1];
-            }else{
-                terrenoUni[i][j][0] = ' ';
-                terrenoUni[i][j][1] = ' ';
-            }
-        }
-    }
-
-    limpaTela();
-    imprimeFinal();
-    //printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\nUniforme:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtdLarg, custoUni, qtdUni);
-*/
     // Interface grafica
     /*
     sf::RenderWindow window(sf::VideoMode(800, 800), "Busca Cega");
