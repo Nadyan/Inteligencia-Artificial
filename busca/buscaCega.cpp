@@ -45,7 +45,6 @@ int distancia[TAM][TAM];
 char terrenoChar[TAM][TAM][2];
 char terrenoLarg[TAM][TAM][2];
 char terrenoUni[TAM][TAM][2];
-int qtdLarg = 0, qtdUni = 0, custoLarg = 0, custoUni = 0;
 
 /* Funcs */
 void montaCenario();
@@ -157,40 +156,9 @@ void imprimeCenario(){
     }
 }
 
-int dfs(int i, int j){
-    terrenoChar[i][j][1] = '.';
-    visitados[i][j] = 1;
-
-    limpaTela();
-    printf("\nExecutando Busca em Profundidade:\n\n");
-    imprimeCenario();
-    usleep(1000*30);
-
-    if(i == destino.x && j == destino.y)
-        return 1;
-    else{
-        /* para cima */
-        if(i - 1 >= 0 && !visitados[i-1][j]){
-			      dfs(i-1, j);
-		}
-        /* para a direita */
-        else if(j + 1 < TAM && !visitados[i][j+1]){
-			      dfs(i, j+1);
-		}
-        /* para baixo */
-        else if(i + 1 < TAM && !visitados[i+1][j]){
-			      dfs(i+1, j);
-		}
-        /* para a esquerda */
-        else if(j - 1 >= 0 && !visitados[i][j-1]){
-			      dfs(i, j-1);
-		}
-    }
-}
-
 void bfs(int i, int j){
     Ponto paternidade[TAM][TAM];
-    int qtd = 0;
+    int qtd = 0, custoLarg = 0;
 
     limpaTela();
     printf("\nExecutando Busca em Largura:\n\n");
@@ -331,7 +299,7 @@ void bfs(int i, int j){
 
 void uniforme(int i, int j){
     Ponto paternidade[TAM][TAM], inicio;
-    int qtd = 0;
+    int qtd = 0, custoUni = 0;
 
     for(int k = 0; k < TAM; k++){
         for(int l = 0; l < TAM; l++){
@@ -436,6 +404,36 @@ Ponto buscaMenor(){
         return menor;
 }
 
+int dfs(int i, int j){
+    terrenoChar[i][j][1] = '.';
+    visitados[i][j] = 1;
+
+    limpaTela();
+    printf("\nExecutando Busca em Profundidade:\n\n");
+    imprimeCenario();
+    usleep(1000*30);
+
+    if(i == destino.x && j == destino.y)
+        return 1;
+    else{
+        /* para cima */
+        if(i - 1 >= 0 && !visitados[i-1][j]){
+			      dfs(i-1, j);
+		}
+        /* para a direita */
+        else if(j + 1 < TAM && !visitados[i][j+1]){
+			      dfs(i, j+1);
+		}
+        /* para baixo */
+        else if(i + 1 < TAM && !visitados[i+1][j]){
+			      dfs(i+1, j);
+		}
+        /* para a esquerda */
+        else if(j - 1 >= 0 && !visitados[i][j-1]){
+			      dfs(i, j-1);
+		}
+    }
+}
 
 int buscaGulosa(int i, int j){
     int menor = 4; // para encontrar o menor
@@ -448,8 +446,6 @@ int buscaGulosa(int i, int j){
   	          destino 30 35
   	          funciona bem
       */
-
-      /* DESCOBRIR FORMA DE TRATAR CAMINHOS SEM SAIDA */
 
     terrenoChar[i][j][1] = '.';
     visitados[i][j] = 1;
@@ -508,40 +504,6 @@ void initVisitados(){
             visitados[i][j] = 0;
         }
     }
-}
-
-void imprimeFinal(){
-    int i, j;
-
-    printf("\nCaminho percorrido pela busca em largura\n\n");
-
-    for(i = 0; i < TAM; i++){
-        for(j = 0; j < TAM; j++){
-            if(i == origem.x && j == origem.y)
-                printf("I  ");
-            else if(i == destino.x && j == destino.y)
-                printf("F  ");
-            else
-                printf("%c%c ", terrenoLarg[i][j][0], terrenoLarg[i][j][1]);
-        }
-        printf("\n");
-    }
-
-    printf("\n\nCaminho percorrido pela busca de custo uniforme:\n\n");
-
-    for(i = 0; i < TAM; i++){
-        for(j = 0; j < TAM; j++){
-          if(i == origem.x && j == origem.y)
-              printf("I  ");
-          else if(i == destino.x && j == destino.y)
-              printf("F  ");
-          else
-              printf("%c%c ", terrenoUni[i][j][0], terrenoUni[i][j][1]);
-        }
-        printf("\n");
-    }
-
-    printf("\nLargura:\n  - Custo: %d\n  - Visitados: %d\n\nUniforme:\n  - Custo: %d\n  - Visitados: %d\n\n", custoLarg, qtdLarg, custoUni, qtdUni);
 }
 
 void limpaTela(){
