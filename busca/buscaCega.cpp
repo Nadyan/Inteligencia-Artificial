@@ -439,9 +439,6 @@ int buscaGulosa(int i, int j){
     int menor = 4; // para encontrar o menor
     int i2 = 42, j2 = 42;
 
-    qtdUni++; // contagem de posicoes
-    custoUni += terreno[i][j];
-
   	  /* Caso origem: 1 1
   	          destino 30 35
   	          funciona bem
