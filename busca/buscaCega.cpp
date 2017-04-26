@@ -51,7 +51,6 @@ void montaCenario();
 void imprimeCenario();
 void limpaTela();
 void initVisitados();
-void imprimeFinal();
 void bfs(int i, int j);
 int dfs(int i, int j);
 void uniforme(int i, int j);
