@@ -51,6 +51,7 @@ int distancia[TAM][TAM];
 char terrenoChar[TAM][TAM][2];
 char terrenoLarg[TAM][TAM][2];
 char terrenoUni[TAM][TAM][2];
+char terrenoAstar[TAM][TAM][2];
 
 /* Funcs */
 void montaCenario();
@@ -59,7 +60,7 @@ void limpaTela();
 void initVisitados();
 void bfs(int i, int j);
 void uniforme(int i, int j);
-void aStar();
+void aStar(int i, int j);
 int manhattan(int i, int j);
 int dfs(int i, int j);
 int buscaGulosa(int i, int j);
@@ -73,22 +74,30 @@ int main(){
     printf("Informe o ponto de destino: ");
     scanf("%d %d", &destino.x, &destino.y);
 
+    //initVisitados();
+    //montaCenario();
+    //limpaTela();
+
+    //printf("\nExecutando Busca em Largura:\n\n");
+    //bfs(origem.x, origem.y);
+
+    //getchar(); getchar();
+
+    //initVisitados();
+    //montaCenario();
+    //limpaTela();
+
+    //printf("\nExecutando Busca Uniforme:\n\n");
+    //uniforme(origem.x, origem.y);
+
+    //getchar(); getchar();
+
     initVisitados();
     montaCenario();
     limpaTela();
 
-    printf("\nExecutando Busca em Largura:\n\n");
-    bfs(origem.x, origem.y);
-
-    getchar(); getchar();
-
-    initVisitados();
-    montaCenario();
-    limpaTela();
-
-    printf("\nExecutando Busca Uniforme:\n\n");
-    uniforme(origem.x, origem.y);
-
+    printf("\nExecutando Busca A*\n\n");
+    aStar(origem.x, origem.y);
 
     // Interface grafica
     /*
@@ -141,6 +150,8 @@ void montaCenario(){
             terrenoLarg[i][j][1] = terrenoChar[i][j][1];
             terrenoUni[i][j][0] = terrenoChar[i][j][0];
             terrenoUni[i][j][1] = terrenoChar[i][j][1];
+            terrenoAstar[i][j][0] = terrenoChar[i][j][0];
+            terrenoAstar[i][j][1] = terrenoChar[i][j][1];
         }
     }
 }
@@ -412,12 +423,8 @@ Ponto buscaMenor(){
 }
 
 void aStar(int i, int j){
-
-    /* A funcao abaixo é a uniforme, modificar ela para
-       A* usando a funcao manhattan */
-
     Ponto paternidade[TAM][TAM], inicio;
-    int qtd = 0, custoStar = 0, f;
+    int qtd = 0, custoAstar = 0, f;
 
     for(int k = 0; k < TAM; k++){
         for(int l = 0; l < TAM; l++){
@@ -445,29 +452,29 @@ void aStar(int i, int j){
 
         /* Calcula as distancias dos vizinhos */
         /* Cima */
-        if(p.x-1 >= 0 && (distancia[p.x-1][p.y] < distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y]) && !visitados[p.x-1][p.y]){
-            distancia[p.x-1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y];
+        if(p.x-1 >= 0 && (distancia[p.x-1][p.y] < (distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y] + manhattan(p.x-1, p.y))) && !visitados[p.x-1][p.y]){
+            distancia[p.x-1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y] + manhattan(p.x-1, p.y);
             terrenoChar[p.x-1][p.y][1] = '.'; limpaTela(); printf("\nExecutando Busca A*:\n\n"); imprimeCenario(); usleep(1000*30);
             paternidade[p.x-1][p.y].paix = p.x; paternidade[p.x-1][p.y].paiy = p.y;
             qtd++;
         }
         /* Direita */
-        if(p.y+1 < TAM && (distancia[p.x][p.y+1] < distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1]) && !visitados[p.x][p.y+1]){
-            distancia[p.x][p.y+1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1];
+        if(p.y+1 < TAM && (distancia[p.x][p.y+1] < (distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1] + manhattan(p.x, p.y+1))) && !visitados[p.x][p.y+1]){
+            distancia[p.x][p.y+1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1] + manhattan(p.x, p.y+1);
             terrenoChar[p.x][p.y+1][1] = '.'; limpaTela(); printf("\nExecutando Busca A*:\n\n"); imprimeCenario(); usleep(1000*30);
             paternidade[p.x][p.y+1].paix = p.x; paternidade[p.x][p.y+1].paiy = p.y;
             qtd++;
         }
         /* Baixo */
-        if(p.x+1 < TAM && (distancia[p.x+1][p.y] < distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y]) && !visitados[p.x+1][p.y]){
-            distancia[p.x+1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y];
+        if(p.x+1 < TAM && (distancia[p.x+1][p.y] < (distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y] + manhattan(p.x+1, p.y))) && !visitados[p.x+1][p.y]){
+            distancia[p.x+1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y] + manhattan(p.x+1, p.y);
             terrenoChar[p.x+1][p.y][1] = '.'; limpaTela(); printf("\nExecutando Busca A*:\n\n"); imprimeCenario(); usleep(1000*30);
             paternidade[p.x+1][p.y].paix = p.x; paternidade[p.x+1][p.y].paiy = p.y;
             qtd++;
         }
         /* Esquerda */
-        if(p.y-1 >= 0 && (distancia[p.x][p.y-1] < distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1]) && !visitados[p.x][p.y-1]){
-            distancia[p.x][p.y-1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1];
+        if(p.y-1 >= 0 && (distancia[p.x][p.y-1] < (distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1] + manhattan(p.x, p.y-1))) && !visitados[p.x][p.y-1]){
+            distancia[p.x][p.y-1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1] + manhattan(p.x, p.y-1);
             terrenoChar[p.x][p.y-1][1] = '.'; limpaTela(); printf("\nExecutando Busca A*:\n\n"); imprimeCenario(); usleep(1000*30);
             paternidade[p.x][p.y-1].paix = p.x; paternidade[p.x][p.y-1].paiy = p.y;
             qtd++;
@@ -478,8 +485,8 @@ void aStar(int i, int j){
     Ponto cam = destino;
     Ponto aux;
     while(paternidade[cam.x][cam.y].paix != -1 && paternidade[cam.x][cam.y].paiy != -1){
-        terrenoUni[cam.x][cam.y][1] = '.';
-        custoUni += terrenoCusto[cam.x][cam.y];
+        terrenoAstar[cam.x][cam.y][1] = '.';
+        custoAstar += terrenoCusto[cam.x][cam.y];
 
         aux.x = cam.x;
         aux.y = cam.y;
@@ -497,20 +504,19 @@ void aStar(int i, int j){
             else if(i == destino.x && j == destino.y)
                 printf("Fi ");
             else
-                printf("%c%c ", terrenoUni[i][j][0], terrenoUni[i][j][1]);
+                printf("%c%c ", terrenoAstar[i][j][0], terrenoAstar[i][j][1]);
         }
         printf("\n");
     }
 
-    printf("\nLargura:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoUni, qtd);
-
+    printf("\nLargura:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoAstar, qtd);
 }
 
 int manhattan(int i, int j){
     /* a distancia de manhattan entre o
-       ponto P1 com coordenadas (x1, y1) 
-       e o ponto P2 em (x2, y2) 
-       é |x1 - x2| + |y1 - y2|           
+       ponto P1 com coordenadas (x1, y1)
+       e o ponto P2 em (x2, y2)
+       é |x1 - x2| + |y1 - y2|
        ou abs(x1 - x2) + abs(y1 - y2)   */
 
     /* A avaliacao heuristica ira retornar h(n),
