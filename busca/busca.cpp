@@ -12,11 +12,6 @@
   Compilar humildemente pra rodar no terminal:
   g++ -o buscaCega buscaCega.cpp
   ./buscaCega
-
-  Para o relatorio:
-    Definir 10 pontos de inicio e fim
-    executar todos os algoritmos
-    tirar a media e desvio padrao
 */
 
 /* Bibs */
@@ -32,6 +27,10 @@
 /* Defs */
 #define TAM 42  //terreno TAMxTAM
 #define INFINITO 99999 // para a busca uniforme
+#define DELAYBFS 10
+#define DELAYUNI 8
+#define DELAYA 8
+#define UFACTOR 2 // underestimation factor para a distancia de manhattan
 
 /* struct para os pontos de origem e destino */
 typedef struct{
@@ -48,6 +47,7 @@ int terreno[TAM][TAM];
 int terrenoCusto[TAM][TAM];
 int visitados[TAM][TAM];
 int distancia[TAM][TAM];
+int distancia_estimada[TAM][TAM];
 char terrenoChar[TAM][TAM][2];
 char terrenoLarg[TAM][TAM][2];
 char terrenoUni[TAM][TAM][2];
@@ -64,7 +64,8 @@ void aStar(int i, int j);
 int manhattan(int i, int j);
 int dfs(int i, int j);
 int buscaGulosa(int i, int j);
-Ponto buscaMenor();
+Ponto buscaMenor_uniforme();
+Ponto buscaMenor_aStar();
 
 int main(){
     int i, j;
@@ -83,14 +84,14 @@ int main(){
 
     //getchar(); getchar();
 
-    //initVisitados();
-    //montaCenario();
-    //limpaTela();
+    initVisitados();
+    montaCenario();
+    limpaTela();
 
-    //printf("\nExecutando Busca Uniforme:\n\n");
-    //uniforme(origem.x, origem.y);
+    printf("\nExecutando Busca Uniforme:\n\n");
+    uniforme(origem.x, origem.y);
 
-    //getchar(); getchar();
+    getchar(); getchar();
 
     initVisitados();
     montaCenario();
@@ -213,7 +214,7 @@ void bfs(int i, int j){
                 visitados[pnovo.x][pnovo.y] = 1;
                 limpaTela(); printf("\nExecutando Busca em Largura:\n\n");
                 imprimeCenario();
-                usleep(1000*30);
+                usleep(1000*DELAYBFS);
             }
         }
         /* direita */
@@ -235,7 +236,7 @@ void bfs(int i, int j){
                 visitados[pnovo.x][pnovo.y] = 1;
                 limpaTela(); printf("\nExecutando Busca em Largura:\n\n");
                 imprimeCenario();
-                usleep(1000*30);
+                usleep(1000*DELAYBFS);
             }
         }
         /* baixo */
@@ -257,7 +258,7 @@ void bfs(int i, int j){
                 visitados[pnovo.x][pnovo.y] = 1;
                 limpaTela(); printf("\nExecutando Busca em Largura:\n\n");
                 imprimeCenario();
-                usleep(1000*30);
+                usleep(1000*DELAYBFS);
             }
         }
         /* esquerda */
@@ -279,7 +280,7 @@ void bfs(int i, int j){
                 visitados[pnovo.x][pnovo.y] = 1;
                 limpaTela(); printf("\nExecutando Busca em Largura:\n\n");
                 imprimeCenario();
-                usleep(1000*30);
+                usleep(1000*DELAYBFS);
             }
         }
     }
@@ -324,7 +325,7 @@ void uniforme(int i, int j){
             if(k == i && l == j)
                 distancia[k][l] = terrenoCusto[k][l];
             else
-                distancia[k][l] = -1;
+                distancia[k][l] = INFINITO;
         }
     }
 
@@ -336,7 +337,7 @@ void uniforme(int i, int j){
     printf("\nExecutando Busca de custo Uniforme:\n\n");
 
     while(1){
-        Ponto p = buscaMenor();
+        Ponto p = buscaMenor_uniforme();
 
         visitados[p.x][p.y] = 1; // marca p como visitado
 
@@ -345,30 +346,46 @@ void uniforme(int i, int j){
 
         /* Calcula as distancias dos vizinhos */
         /* Cima */
-        if(p.x-1 >= 0 && (distancia[p.x-1][p.y] < distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y]) && !visitados[p.x-1][p.y]){
+        if(p.x-1 >= 0 && (distancia[p.x-1][p.y] > distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y]) && !visitados[p.x-1][p.y]){
             distancia[p.x-1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y];
-            terrenoChar[p.x-1][p.y][1] = '.'; limpaTela(); printf("\nExecutando Busca Uniforme:\n\n"); imprimeCenario(); usleep(1000*30);
+            terrenoChar[p.x-1][p.y][1] = '.';
+            limpaTela();
+            printf("\nExecutando Busca Uniforme:\n\n");
+            imprimeCenario();
+            usleep(1000*DELAYUNI);
             paternidade[p.x-1][p.y].paix = p.x; paternidade[p.x-1][p.y].paiy = p.y;
             qtd++;
         }
         /* Direita */
-        if(p.y+1 < TAM && (distancia[p.x][p.y+1] < distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1]) && !visitados[p.x][p.y+1]){
+        if(p.y+1 < TAM && (distancia[p.x][p.y+1] > distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1]) && !visitados[p.x][p.y+1]){
             distancia[p.x][p.y+1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1];
-            terrenoChar[p.x][p.y+1][1] = '.'; limpaTela(); printf("\nExecutando Busca Uniforme:\n\n"); imprimeCenario(); usleep(1000*30);
+            terrenoChar[p.x][p.y+1][1] = '.';
+            limpaTela();
+            printf("\nExecutando Busca Uniforme:\n\n");
+            imprimeCenario();
+            usleep(1000*DELAYUNI);
             paternidade[p.x][p.y+1].paix = p.x; paternidade[p.x][p.y+1].paiy = p.y;
             qtd++;
         }
         /* Baixo */
-        if(p.x+1 < TAM && (distancia[p.x+1][p.y] < distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y]) && !visitados[p.x+1][p.y]){
+        if(p.x+1 < TAM && (distancia[p.x+1][p.y] > distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y]) && !visitados[p.x+1][p.y]){
             distancia[p.x+1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y];
-            terrenoChar[p.x+1][p.y][1] = '.'; limpaTela(); printf("\nExecutando Busca Uniforme:\n\n"); imprimeCenario(); usleep(1000*30);
+            terrenoChar[p.x+1][p.y][1] = '.';
+            limpaTela();
+            printf("\nExecutando Busca Uniforme:\n\n");
+            imprimeCenario();
+            usleep(1000*DELAYUNI);
             paternidade[p.x+1][p.y].paix = p.x; paternidade[p.x+1][p.y].paiy = p.y;
             qtd++;
         }
         /* Esquerda */
-        if(p.y-1 >= 0 && (distancia[p.x][p.y-1] < distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1]) && !visitados[p.x][p.y-1]){
+        if(p.y-1 >= 0 && (distancia[p.x][p.y-1] > distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1]) && !visitados[p.x][p.y-1]){
             distancia[p.x][p.y-1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1];
-            terrenoChar[p.x][p.y-1][1] = '.'; limpaTela(); printf("\nExecutando Busca Uniforme:\n\n"); imprimeCenario(); usleep(1000*30);
+            terrenoChar[p.x][p.y-1][1] = '.';
+            limpaTela();
+            printf("\nExecutando Busca Uniforme:\n\n");
+            imprimeCenario();
+            usleep(1000*DELAYUNI);
             paternidade[p.x][p.y-1].paix = p.x; paternidade[p.x][p.y-1].paiy = p.y;
             qtd++;
         }
@@ -405,15 +422,31 @@ void uniforme(int i, int j){
     printf("\nLargura:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoUni, qtd);
 }
 
+Ponto buscaMenor_uniforme(){
+    int i, j, min = INFINITO;
+    Ponto menor;
 
-Ponto buscaMenor(){
+    for(i = 0; i < TAM; i++){
+        for(j = 0; j < TAM; j++){
+            if(distancia[i][j] != -1 && distancia[i][j] < min && !visitados[i][j]){
+                min = distancia[i][j];
+                menor.x = i;
+                menor.y = j;
+            }
+        }
+    }
+    return menor;
+}
+
+
+Ponto buscaMenor_aStar(){
         int i, j, min = INFINITO;
         Ponto menor;
 
         for(i = 0; i < TAM; i++){
             for(j = 0; j < TAM; j++){
-                if(distancia[i][j] != -1 && distancia[i][j] < min && !visitados[i][j]){
-                    min = distancia[i][j];
+                if(distancia_estimada[i][j] != -1 && distancia_estimada[i][j] < min && !visitados[i][j]){
+                    min = distancia_estimada[i][j];
                     menor.x = i;
                     menor.y = j;
                 }
@@ -424,14 +457,17 @@ Ponto buscaMenor(){
 
 void aStar(int i, int j){
     Ponto paternidade[TAM][TAM], inicio;
-    int qtd = 0, custoAstar = 0, f;
+    int qtd = 0, custoAstar = 0;
 
     for(int k = 0; k < TAM; k++){
         for(int l = 0; l < TAM; l++){
-            if(k == i && l == j)
+            if(k == i && l == j){
+                distancia_estimada[k][l] = terrenoCusto[k][l] + manhattan(k, l);
                 distancia[k][l] = terrenoCusto[k][l];
-            else
+            }else{
+                distancia_estimada[k][l] = INFINITO; // -1;
                 distancia[k][l] = -1;
+            }
         }
     }
 
@@ -443,7 +479,7 @@ void aStar(int i, int j){
     printf("\nExecutando Busca A*:\n\n");
 
     while(1){
-        Ponto p = buscaMenor();
+        Ponto p = buscaMenor_aStar();
 
         visitados[p.x][p.y] = 1; // marca p como visitado
 
@@ -452,30 +488,50 @@ void aStar(int i, int j){
 
         /* Calcula as distancias dos vizinhos */
         /* Cima */
-        if(p.x-1 >= 0 && (distancia[p.x-1][p.y] < (distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y] + manhattan(p.x-1, p.y))) && !visitados[p.x-1][p.y]){
-            distancia[p.x-1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y] + manhattan(p.x-1, p.y);
-            terrenoChar[p.x-1][p.y][1] = '.'; limpaTela(); printf("\nExecutando Busca A*:\n\n"); imprimeCenario(); usleep(1000*30);
+        if(p.x-1 >= 0 && (distancia_estimada[p.x-1][p.y] > (distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y] + manhattan(p.x-1, p.y))) && !visitados[p.x-1][p.y]){
+            distancia_estimada[p.x-1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y] + manhattan(p.x-1, p.y);
+            distancia[p.x-1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x-1][p.y];
+            terrenoChar[p.x-1][p.y][1] = '.';
+            limpaTela();
+            printf("\nExecutando Busca A*:\n\n");
+            imprimeCenario();
+            usleep(1000*DELAYA);
             paternidade[p.x-1][p.y].paix = p.x; paternidade[p.x-1][p.y].paiy = p.y;
             qtd++;
         }
         /* Direita */
-        if(p.y+1 < TAM && (distancia[p.x][p.y+1] < (distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1] + manhattan(p.x, p.y+1))) && !visitados[p.x][p.y+1]){
-            distancia[p.x][p.y+1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1] + manhattan(p.x, p.y+1);
-            terrenoChar[p.x][p.y+1][1] = '.'; limpaTela(); printf("\nExecutando Busca A*:\n\n"); imprimeCenario(); usleep(1000*30);
+        if(p.y+1 < TAM && (distancia_estimada[p.x][p.y+1] > (distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1] + manhattan(p.x, p.y+1))) && !visitados[p.x][p.y+1]){
+            distancia_estimada[p.x][p.y+1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1] + manhattan(p.x, p.y+1);
+            distancia[p.x][p.y+1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y+1];
+            terrenoChar[p.x][p.y+1][1] = '.';
+            limpaTela();
+            printf("\nExecutando Busca A*:\n\n");
+            imprimeCenario();
+            usleep(1000*DELAYA);
             paternidade[p.x][p.y+1].paix = p.x; paternidade[p.x][p.y+1].paiy = p.y;
             qtd++;
         }
         /* Baixo */
-        if(p.x+1 < TAM && (distancia[p.x+1][p.y] < (distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y] + manhattan(p.x+1, p.y))) && !visitados[p.x+1][p.y]){
-            distancia[p.x+1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y] + manhattan(p.x+1, p.y);
-            terrenoChar[p.x+1][p.y][1] = '.'; limpaTela(); printf("\nExecutando Busca A*:\n\n"); imprimeCenario(); usleep(1000*30);
+        if(p.x+1 < TAM && (distancia_estimada[p.x+1][p.y] > (distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y] + manhattan(p.x+1, p.y))) && !visitados[p.x+1][p.y]){
+            distancia_estimada[p.x+1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y] + manhattan(p.x+1, p.y);
+            distancia[p.x+1][p.y] = distancia[p.x][p.y] + terrenoCusto[p.x+1][p.y];
+            terrenoChar[p.x+1][p.y][1] = '.';
+            limpaTela();
+            printf("\nExecutando Busca A*:\n\n");
+            imprimeCenario();
+            usleep(1000*DELAYA);
             paternidade[p.x+1][p.y].paix = p.x; paternidade[p.x+1][p.y].paiy = p.y;
             qtd++;
         }
         /* Esquerda */
-        if(p.y-1 >= 0 && (distancia[p.x][p.y-1] < (distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1] + manhattan(p.x, p.y-1))) && !visitados[p.x][p.y-1]){
-            distancia[p.x][p.y-1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1] + manhattan(p.x, p.y-1);
-            terrenoChar[p.x][p.y-1][1] = '.'; limpaTela(); printf("\nExecutando Busca A*:\n\n"); imprimeCenario(); usleep(1000*30);
+        if(p.y-1 >= 0 && (distancia_estimada[p.x][p.y-1] > (distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1] + manhattan(p.x, p.y-1))) && !visitados[p.x][p.y-1]){
+            distancia_estimada[p.x][p.y-1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1] + manhattan(p.x, p.y-1);
+            distancia[p.x][p.y-1] = distancia[p.x][p.y] + terrenoCusto[p.x][p.y-1];
+            terrenoChar[p.x][p.y-1][1] = '.';
+            limpaTela();
+            printf("\nExecutando Busca A*:\n\n");
+            imprimeCenario();
+            usleep(1000*DELAYA);
             paternidade[p.x][p.y-1].paix = p.x; paternidade[p.x][p.y-1].paiy = p.y;
             qtd++;
         }
@@ -528,7 +584,7 @@ int manhattan(int i, int j){
     Ponto p;
     p.x = i; p.y = j;
 
-    return h = abs(p.x - destino.x) + abs(p.y - destino.y);
+    return abs(p.x - destino.x) + abs(p.y - destino.y);
 }
 
 
