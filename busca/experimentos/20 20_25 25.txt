@@ -1,0 +1,11 @@
+BFS:
+    qtd nós:
+    custo:
+
+Uniforme:
+    qtd nós:
+    custo:
+
+A*:
+    qtd nós:
+    custo:

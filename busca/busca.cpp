@@ -1,7 +1,9 @@
 /*
   Nadyan Suriel Pscheidt
   Inteligencia artificial
-  Busca Cega
+  - Busca BFS
+  - Busca Uniforme
+  - Busca A*
 
   Compilar com Interface grafica:
   sudo apt-get install libsfml-dev
@@ -26,11 +28,11 @@
 
 /* Defs */
 #define TAM 42  //terreno TAMxTAM
-#define INFINITO 99999 // para a busca uniforme
-#define DELAYBFS 10
-#define DELAYUNI 8
-#define DELAYA 8
-#define UFACTOR 2 // underestimation factor para a distancia de manhattan
+#define INFINITO 99999
+#define DELAYBFS 20
+#define DELAYUNI 30
+#define DELAYA 30
+#define SUPERESTIMATIVA 1 // superestimando o valor da distancia (1 = nada)
 
 /* struct para os pontos de origem e destino */
 typedef struct{
@@ -62,6 +64,7 @@ void bfs(int i, int j);
 void uniforme(int i, int j);
 void aStar(int i, int j);
 int manhattan(int i, int j);
+int euclidiana(int i, int j);
 int dfs(int i, int j);
 int buscaGulosa(int i, int j);
 Ponto buscaMenor_uniforme();
@@ -84,14 +87,14 @@ int main(){
 
     //getchar(); getchar();
 
-    initVisitados();
-    montaCenario();
-    limpaTela();
+    //initVisitados();
+    //montaCenario();
+    //limpaTela();
 
-    printf("\nExecutando Busca Uniforme:\n\n");
-    uniforme(origem.x, origem.y);
+    //printf("\nExecutando Busca Uniforme:\n\n");
+    //uniforme(origem.x, origem.y);
 
-    getchar(); getchar();
+    //getchar(); getchar();
 
     initVisitados();
     montaCenario();
@@ -99,24 +102,6 @@ int main(){
 
     printf("\nExecutando Busca A*\n\n");
     aStar(origem.x, origem.y);
-
-    // Interface grafica
-    /*
-    sf::RenderWindow window(sf::VideoMode(800, 800), "Busca Cega");
-    sf::RectangleShape rectangle(sf::Vector2f(120, 50));
-    rectangle.setFillColor(sf::Color::Blue);
-
-    while(window.isOpen()){
-      sf::Event event;
-      while(window.pollEvent(event)){
-        if(event.type == sf::Event::Closed)
-          window.close();
-      }
-
-      window.clear(sf::Color::Black);
-      window.draw(rectangle);
-      window.display();
-    }*/
 
 	return 0;
 }
@@ -419,7 +404,7 @@ void uniforme(int i, int j){
         printf("\n");
     }
 
-    printf("\nLargura:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoUni, qtd);
+    printf("\nUniforme:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoUni, qtd);
 }
 
 Ponto buscaMenor_uniforme(){
@@ -565,7 +550,7 @@ void aStar(int i, int j){
         printf("\n");
     }
 
-    printf("\nLargura:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoAstar, qtd);
+    printf("\nA*:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoAstar, qtd);
 }
 
 int manhattan(int i, int j){
@@ -580,13 +565,18 @@ int manhattan(int i, int j){
        sendo g(n) a distância de n ao nó inicial (custo uniforme)
        e h(n) a distância estimada de n ao nó final (manhattan)    */
 
-    int h;
     Ponto p;
     p.x = i; p.y = j;
 
-    return abs(p.x - destino.x) + abs(p.y - destino.y);
+    return (abs(p.x - destino.x) + abs(p.y - destino.y)) * SUPERESTIMATIVA;
 }
 
+int euclidiana(int i, int j){
+    Ponto p;
+    p.x = i; p.y = j;
+
+    //return (sqrt((p.x - destino.x)^2 + (p.y - destino.y)^2)) * SUPERESTIMATIVA;
+}
 
 int dfs(int i, int j){
     terrenoChar[i][j][1] = '.';
