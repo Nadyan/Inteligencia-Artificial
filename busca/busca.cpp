@@ -16,6 +16,7 @@
   ./buscaCega
 */
 
+
 /* Bibs */
 #include <cstdio>
 #include <cstring>
@@ -26,6 +27,7 @@
 #include <cmath>
 //#include <SFML/Graphics.hpp>
 
+
 /* Defs */
 #define TAM 42  //terreno TAMxTAM
 #define INFINITO 99999
@@ -34,12 +36,14 @@
 #define DELAYA 30
 #define SUPERESTIMATIVA 1 // superestimando o valor da distancia (1 = nada)
 
+
 /* struct para os pontos de origem e destino */
 typedef struct{
     int x;
     int y;
     int paix, paiy;
 }Ponto;
+
 
 /* Vars */
 std::list<Ponto> lista;
@@ -55,6 +59,7 @@ char terrenoLarg[TAM][TAM][2];
 char terrenoUni[TAM][TAM][2];
 char terrenoAstar[TAM][TAM][2];
 
+
 /* Funcs */
 void montaCenario();
 void imprimeCenario();
@@ -65,10 +70,9 @@ void uniforme(int i, int j);
 void aStar(int i, int j);
 int manhattan(int i, int j);
 int euclidiana(int i, int j);
-int dfs(int i, int j);
-int buscaGulosa(int i, int j);
 Ponto buscaMenor_uniforme();
 Ponto buscaMenor_aStar();
+
 
 int main(){
     int i, j;
@@ -106,6 +110,7 @@ int main(){
 	return 0;
 }
 
+
 void montaCenario(){
     FILE *f = fopen("terreno.txt", "r");
     int i, j;
@@ -142,6 +147,7 @@ void montaCenario(){
     }
 }
 
+
 void imprimeCenario(){
     int i, j;
 
@@ -159,6 +165,7 @@ void imprimeCenario(){
         printf("\n");
     }
 }
+
 
 void bfs(int i, int j){
     Ponto paternidade[TAM][TAM];
@@ -301,6 +308,7 @@ void bfs(int i, int j){
     printf("\nLargura:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoLarg, qtd);
 }
 
+
 void uniforme(int i, int j){
     Ponto paternidade[TAM][TAM], inicio;
     int qtd = 0, custoUni = 0;
@@ -407,6 +415,7 @@ void uniforme(int i, int j){
     printf("\nUniforme:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoUni, qtd);
 }
 
+
 Ponto buscaMenor_uniforme(){
     int i, j, min = INFINITO;
     Ponto menor;
@@ -440,6 +449,7 @@ Ponto buscaMenor_aStar(){
         return menor;
 }
 
+
 void aStar(int i, int j){
     Ponto paternidade[TAM][TAM], inicio;
     int qtd = 0, custoAstar = 0;
@@ -450,7 +460,7 @@ void aStar(int i, int j){
                 distancia_estimada[k][l] = terrenoCusto[k][l] + manhattan(k, l);
                 distancia[k][l] = terrenoCusto[k][l];
             }else{
-                distancia_estimada[k][l] = INFINITO; // -1;
+                distancia_estimada[k][l] = INFINITO;
                 distancia[k][l] = -1;
             }
         }
@@ -553,6 +563,7 @@ void aStar(int i, int j){
     printf("\nA*:\n  - Custo: %d\n  - Nos expandidos: %d\n\n", custoAstar, qtd);
 }
 
+
 int manhattan(int i, int j){
     /* a distancia de manhattan entre o
        ponto P1 com coordenadas (x1, y1)
@@ -571,6 +582,7 @@ int manhattan(int i, int j){
     return (abs(p.x - destino.x) + abs(p.y - destino.y)) * SUPERESTIMATIVA;
 }
 
+
 int euclidiana(int i, int j){
     Ponto p;
     p.x = i; p.y = j;
@@ -578,94 +590,6 @@ int euclidiana(int i, int j){
     //return (sqrt((p.x - destino.x)^2 + (p.y - destino.y)^2)) * SUPERESTIMATIVA;
 }
 
-int dfs(int i, int j){
-    terrenoChar[i][j][1] = '.';
-    visitados[i][j] = 1;
-
-    limpaTela();
-    printf("\nExecutando Busca em Profundidade:\n\n");
-    imprimeCenario();
-    usleep(1000*30);
-
-    if(i == destino.x && j == destino.y)
-        return 1;
-    else{
-        /* para cima */
-        if(i - 1 >= 0 && !visitados[i-1][j]){
-            dfs(i-1, j);
-		}
-        /* para a direita */
-        else if(j + 1 < TAM && !visitados[i][j+1]){
-            dfs(i, j+1);
-		}
-        /* para baixo */
-        else if(i + 1 < TAM && !visitados[i+1][j]){
-            dfs(i+1, j);
-		}
-        /* para a esquerda */
-        else if(j - 1 >= 0 && !visitados[i][j-1]){
-            dfs(i, j-1);
-		}
-    }
-}
-
-int buscaGulosa(int i, int j){
-    int menor = 4; // para encontrar o menor
-    int i2 = 42, j2 = 42;
-
-  	  /* Caso origem: 1 1
-  	          destino 30 35
-  	          funciona bem
-      */
-
-    terrenoChar[i][j][1] = '.';
-    visitados[i][j] = 1;
-
-    limpaTela();
-    printf("\n\nExecutando Busca Cega Gulosa:\n\n");
-    imprimeCenario();
-    usleep(1000*30);
-
-    if(i == destino.x && j == destino.y)
-        return 1;
-    else{
-        /* escolha do vizinho de menor custo */
-        /* se for para cima */
-        if(i - 1 >= 0 && !visitados[i-1][j]){
-            if(terreno[i-1][j] < menor ){
-                i2 = i-1; j2 = j;
-                menor = terreno[i-1][j];
-            }
-        }
-        /* se for para a direitra */
-        if(j + 1 < TAM && !visitados[i][j+1]){
-            if(terreno[i][j+1] < menor){
-                i2 = i; j2 = j+1;
-                menor = terreno[i][j+1];
-            }
-        }
-        /* se for para baixo */
-        if(i + 1 < TAM && !visitados[i+1][j]){
-            if(terreno[i+1][j] < menor){
-                i2 = i+1; j2 = j;
-                menor = terreno[i+1][j];
-            }
-        }
-        /* se for para a esquerda */
-        if(j - 1 >= 0 && !visitados[i][j-1]){
-            if(terreno[i][j-1] < menor){
-                i2 = i; j2 = j-1;
-                menor = terreno[i][j-1];
-            }
-        }
-        if(i2 != 42 && j2 != 42) /* se entrou em algum if */
-            uniforme(i2, j2);
-        else{
-            printf("\n\nFalha na busca, caminho nao encontrado!\n\n");
-            return 1;
-        }
-    }
-}
 
 void initVisitados(){
     int i, j;
@@ -676,6 +600,7 @@ void initVisitados(){
         }
     }
 }
+
 
 void limpaTela(){
     system("clear");
