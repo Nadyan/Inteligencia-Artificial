@@ -9,3 +9,11 @@ Uniforme:
 A*:
     qtd nós:
     custo:
+
+A*1:
+    qtd nós:
+    custo:
+
+A*2:
+    qtd nós:
+    custo:
