@@ -32,8 +32,8 @@
 #define TAM 42  //terreno TAMxTAM
 #define INFINITO 99999
 #define DELAYBFS 20
-#define DELAYUNI 30
-#define DELAYA 30
+#define DELAYUNI 20
+#define DELAYA 20
 #define SUPERESTIMATIVA 1 // superestimando o valor da distancia (1 = nada)
 
 
@@ -82,23 +82,23 @@ int main(){
     printf("Informe o ponto de destino: ");
     scanf("%d %d", &destino.x, &destino.y);
 
-    //initVisitados();
-    //montaCenario();
-    //limpaTela();
+    initVisitados();
+    montaCenario();
+    limpaTela();
 
-    //printf("\nExecutando Busca em Largura:\n\n");
-    //bfs(origem.x, origem.y);
+    printf("\nExecutando Busca em Largura:\n\n");
+    bfs(origem.x, origem.y);
 
-    //getchar(); getchar();
+    getchar(); getchar();
 
-    //initVisitados();
-    //montaCenario();
-    //limpaTela();
+    initVisitados();
+    montaCenario();
+    limpaTela();
 
-    //printf("\nExecutando Busca Uniforme:\n\n");
-    //uniforme(origem.x, origem.y);
+    printf("\nExecutando Busca Uniforme:\n\n");
+    uniforme(origem.x, origem.y);
 
-    //getchar(); getchar();
+    getchar();
 
     initVisitados();
     montaCenario();
