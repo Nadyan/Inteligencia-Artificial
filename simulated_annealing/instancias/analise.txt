@@ -1,0 +1,8 @@
+
+- cada linha é uma clausula;
+
+- o numero nas clausulas representa qual variavel
+
+- o '-' representa negação (not 4 = -4)
+
+
