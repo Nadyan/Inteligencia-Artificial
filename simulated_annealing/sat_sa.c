@@ -1,5 +1,4 @@
 /*
-
     Nadyan Suriel Pscheidt
     Inteligência Artificial
     
@@ -19,7 +18,7 @@
 #define T0                  100         // Temperatura inicial
 #define TN                  0           // Temperatura final
 #define N                   500000      // Quantidade de iterações
-#define CHANCE_PERTURBACAO  20          // 20% de chance de bit flip da solucao
+#define CHANCE_PERTURBACAO  3           // % de chance de bit flip da solucao
 #define INSTANCIA           1
 
 /* instancia 1 */
@@ -37,9 +36,9 @@
 /* Funcoes */
 void monta_vetores();
 void gera_solucao_inicial();
-int resfriamento(int i, int temp);                // i representa a temperatura atual
-int avalia_solucao();                   // retorna 1 caso seja melhor, e 0 caso seja pior
-void perturba();
+int resfriamento(int i, int temp);                
+int avalia_solucao();			// fitness
+void perturba();				// crossover
 
 /* Vars */
 int tam = 3 * QTDCLAUS;
