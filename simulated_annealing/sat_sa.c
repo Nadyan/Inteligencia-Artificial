@@ -15,10 +15,10 @@
 #include <time.h>
 
 /* Defines */
-#define T0                  100         // Temperatura inicial
-#define TN                  0           // Temperatura final
-#define N                   500000      // Quantidade de iterações
-#define CHANCE_PERTURBACAO  3           // % de chance de bit flip da solucao
+#define T0                  500000       // Temperatura inicial
+#define TN                  0            // Temperatura final
+#define N                   500000       // Quantidade de iterações
+#define CHANCE_PERTURBACAO  3            // % de chance de bit flip da solucao
 #define INSTANCIA           1
 
 /* instancia 1 */
@@ -36,7 +36,7 @@
 /* Funcoes */
 void monta_vetores();
 void gera_solucao_inicial();
-int resfriamento(int i, int temp);                
+int resfriamento(int i);                
 int avalia_solucao();			// fitness
 void perturba();				// crossover
 
@@ -47,10 +47,12 @@ int negs[3 * QTDCLAUS];
 int solucao[QTDVARS];
 int candidato_sol[QTDVARS];
 int qtdAnterior = 0;
-
+int delta;
 
 int main(){
-    int j, k, temperatura = T0, chance;
+    int j, k, aux;
+    int temperatura = T0;
+    float chance;
 
     srand((unsigned)time(NULL));
     
@@ -58,29 +60,27 @@ int main(){
     gera_solucao_inicial();
 
     for(j = 0; j < N; j++){
-        int aux;
-        
+      
         aux = avalia_solucao();                 // avalia a solucao contida no candidato_sol[]
+        temperatura = resfriamento(j);
         
         if(aux == 1){                           // se a solucao candidata for melhor
-            
             for(k = 0; k < tam; k++)
                 solucao[k] = candidato_sol[k];  // atribui como solucao
             
-            perturba();
-            temperatura = resfriamento(j, temperatura);
         }else if(aux == 0){                     // se a solucao canditada for pior
-            temperatura = resfriamento(j, temperatura);
             
-            chance = rand() % 100;              // calcula a chance de atribuir a solucao pior de acordo com a temperatura
+            chance = rand() % 100;
+            //printf("%f\n", chance);
             
-            if(chance < temperatura){           // se der, atribui a solucao pior
+            if(chance < (3^(-delta/temperatura))*100){           // se der, atribui a solucao pior
+            //if(chance < temperatura){
                 for(k = 0; k < tam; k++)
                     solucao[k] = candidato_sol[k];
             }
-            
-            perturba();                         // se nao for melhor, apenas gera nova
         }
+
+        perturba();
     }
 
     return 0;
@@ -148,6 +148,9 @@ void perturba(){
                 candidato_sol[i] = 0;
         }
     }*/
+
+    for(i = 0; i < QTDVARS; i++)
+        candidato_sol[i] = solucao[i];	
     
     /* Muda um bit */
     chance = rand() % QTDVARS;
@@ -161,6 +164,8 @@ void perturba(){
 int avalia_solucao(){
     int qtdSatisfeitas = 0, n; // var contadora de clausulas satisfeitas
     int var1, var2, var3;
+
+    //FILE *escreve = fopen("resultados.txt", "a+");
             
     // 3-CNF -> (A || B || C) && (D || E || F) && ...
     for(n = 0; n < tam; n += 3){
@@ -191,29 +196,29 @@ int avalia_solucao(){
             qtdSatisfeitas++;
     }
     
-    //printf("%d\n", qtdSatisfeitas);
+    printf("%d\n", qtdSatisfeitas);
+    //fprintf(escreve, "%d\n" , qtdSatisfeitas);
+
+    delta = qtdSatisfeitas - qtdAnterior;
     
     if(qtdSatisfeitas >= qtdAnterior){
         qtdAnterior = qtdSatisfeitas;
-        printf("%d\n", qtdSatisfeitas);
+        //printf("%d\n", qtdSatisfeitas);
         return 1;
     }else
         return 0;
 
 }
 
-int resfriamento(int i, int temp){
-    int novaTemp;           // nova temperatura que o sistema adquire apos interaçãoca
-
-    if(temp > TN){             // se ainda nao alcancou a temperatura final TN
+int resfriamento(int i){
+    int novaTemp;
         
-        /* Fórmula de resfriamento linear */
-        novaTemp = T0 - i * ((T0 - TN) / N);
-        //printf("%d\n", novaTemp);
-        return novaTemp;
-    }else{
-        return -1;           // temperatura final atingida
-    }
+    /* Fórmula de resfriamento linear */
+    novaTemp = T0 - i * ((T0 - TN) / N);
+
+    //printf("%d\n", novaTemp);
+        
+    return novaTemp;
 }
 
 
