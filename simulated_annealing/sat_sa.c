@@ -43,10 +43,11 @@ void perturba();
 
 /* Vars */
 int tam = 3 * QTDCLAUS;
-int vet[QTDCLAUS];
-int negs[QTDVARS];
-int solucao[3 * QTDCLAUS];
-int candidato_sol[3 * QTDCLAUS];
+int vet[3 * QTDCLAUS];
+int negs[3 * QTDCLAUS];
+int solucao[QTDVARS];
+int candidato_sol[QTDVARS];
+int qtdAnterior = 0;
 
 
 int main(){
@@ -69,7 +70,7 @@ int main(){
             
             perturba();
             temperatura = resfriamento(j, temperatura);
-        }else{
+        }else if(aux == 0){                     // se a solucao canditada for pior
             temperatura = resfriamento(j, temperatura);
             
             chance = rand() % 100;              // calcula a chance de atribuir a solucao pior de acordo com a temperatura
@@ -139,7 +140,7 @@ void perturba(){
     int chance, i;
 
     /* existe uma chance de x% de bit flip */
-    for(i = 0; i < tam; i++){
+    /*for(i = 0; i < QTDVARS; i++){
         chance = rand() % 100;
         if(chance <= CHANCE_PERTURBACAO){
             if(candidato_sol[i] == 0)
@@ -147,58 +148,73 @@ void perturba(){
             else if(candidato_sol[i] == 1)
                 candidato_sol[i] = 0;
         }
-    }
+    }*/
+    
+    /* Muda um bit */
+    chance = rand() % QTDVARS;
+    if(candidato_sol[chance] == 0)
+        candidato_sol[chance] = 1;
+    else if(candidato_sol[chance] == 1)
+        candidato_sol[chance] = 0;
+    
 }
 
 int avalia_solucao(){
-    int qtdSatisfeitas = 0; // var contadora de clausulas satisfeitas
+    int qtdSatisfeitas = 0, n; // var contadora de clausulas satisfeitas
     int var1, var2, var3;
-    int var1neg = 0; var2neg = 0; var3neg = 0;
-
-    // pega candidato_sol e ve quantas clausulas ele satisfaz
-        // se for melhor do que qtdAnteriorSat
-            // qtdAnteriorSat = qtdSatisfeitas;
-            // return 1;
-        //else
-            // return 0;
             
-    // 3-CNF -> (A && B && C) || (D && E && F)
+    // 3-CNF -> (A || B || C) && (D || E || F) && ...
     for(n = 0; n < tam; n += 3){
-        var1 = vet[n];
-        var2 = vet[n+1];
-        var3 = vet[n+2];
+        var1 = candidato_sol[vet[n]];
+        var2 = candidato_sol[vet[n+1]];
+        var3 = candidato_sol[vet[n+2]];
         
-        if(negs[n] == 1)
-            var1neg = 1;
-        if(negs[n+1] == 1)
-            var2neg = 1;
-        if(negs[n+2] == 1)
-            var3neg = 1;
-    } 
+        if(negs[n] == 1){
+            if(var1 == 1)
+                var1 = 0;
+            else if(var1 == 0)
+                var1 = 1;
+        }
+        if(negs[n+1] == 1){
+            if(var2 == 1)
+                var2 = 0;
+            else if(var2 == 0)
+                var2 = 1;
+        }
+        if(negs[n+2] == 1){
+            if(var3 == 1)
+                var3 = 0;
+            else if(var3 == 0)
+                var3 = 1;
+        }
+        
+        if(var1 || var2 || var3)
+            qtdSatisfeitas++;
+    }
+    
+    //printf("%d\n", qtdSatisfeitas);
+    
+    if(qtdSatisfeitas >= qtdAnterior){
+        qtdAnterior = qtdSatisfeitas;
+        printf("%d\n", qtdSatisfeitas);
+        return 1;
+    }else
+        return 0;
 
 }
 
 int resfriamento(int i, int temp){
-    int novaTemp;           // nova temperatura que o sistema adquire apos interação
+    int novaTemp;           // nova temperatura que o sistema adquire apos interaçãoca
 
     if(temp > TN){             // se ainda nao alcancou a temperatura final TN
         
         /* Fórmula de resfriamento linear */
         novaTemp = T0 - i * ((T0 - TN) / N);
-
+        //printf("%d\n", novaTemp);
         return novaTemp;
     }else{
         return -1;           // temperatura final atingida
     }
 }
-
-
-
-
-
-
-
-
-
 
 

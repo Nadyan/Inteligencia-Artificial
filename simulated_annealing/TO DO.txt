@@ -1,0 +1,7 @@
+- FIX resfriamento()
+    - Está retornando sempre 100º
+
+- FIX probabilidade de aceitar solucao pior
+    - Está como uma porcentagem entre 0 e a temperatura atual
+    - Fazer de acordo com a formula e^(-d/T)
+
