@@ -12,6 +12,8 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 /* Defines */
 #define T0                  100         // Temperatura inicial
@@ -35,7 +37,7 @@
 /* Funcoes */
 void monta_vetores();
 void gera_solucao_inicial();
-int resfriamento(int i);                // i representa a temperatura atual
+int resfriamento(int i, int temp);                // i representa a temperatura atual
 int avalia_solucao();                   // retorna 1 caso seja melhor, e 0 caso seja pior
 void perturba();
 
@@ -44,20 +46,42 @@ int tam = 3 * QTDCLAUS;
 int vet[QTDCLAUS];
 int negs[QTDVARS];
 int solucao[3 * QTDCLAUS];
+int candidato_sol[3 * QTDCLAUS];
 
 
 int main(){
+    int j, k, temperatura = T0, chance;
+
     srand((unsigned)time(NULL));
     
     monta_vetores();
     gera_solucao_inicial();
-    printf("\n\n");
-    perturba();
-    printf("\n\n");
-    perturba();
-    printf("\n\n");
-    perturba();
 
+    for(j = 0; j < N; j++){
+        int aux;
+        
+        aux = avalia_solucao();                 // avalia a solucao contida no candidato_sol[]
+        
+        if(aux == 1){                           // se a solucao candidata for melhor
+            
+            for(k = 0; k < tam; k++)
+                solucao[k] = candidato_sol[k];  // atribui como solucao
+            
+            perturba();
+            temperatura = resfriamento(j, temperatura);
+        }else{
+            temperatura = resfriamento(j, temperatura);
+            
+            chance = rand() % 100;              // calcula a chance de atribuir a solucao pior de acordo com a temperatura
+            
+            if(chance < temperatura){           // se der, atribui a solucao pior
+                for(k = 0; k < tam; k++)
+                    solucao[k] = candidato_sol[k];
+            }
+            
+            perturba();                         // se nao for melhor, apenas gera nova
+        }
+    }
 
     return 0;
 }
@@ -103,8 +127,10 @@ void gera_solucao_inicial(){
         
         if(chance < 50){
             solucao[i] = 1; // 50% de chance de ser 1
+            candidato_sol[i] = 1;
         }else{
             solucao[i] = 0; // 50& de chance de ser 0
+            candidato_sol[i] = 0;
         }
     }
 }
@@ -116,34 +142,53 @@ void perturba(){
     for(i = 0; i < tam; i++){
         chance = rand() % 100;
         if(chance <= CHANCE_PERTURBACAO){
-            if(solucao[i] == 0)
-                solucao[i] = 1;
-            else if(solucao[i] == 1)
-                solucao[i] = 0;
+            if(candidato_sol[i] == 0)
+                candidato_sol[i] = 1;
+            else if(candidato_sol[i] == 1)
+                candidato_sol[i] = 0;
         }
     }
 }
 
 int avalia_solucao(){
-    int melhor;             // Flag sinalizando a melhora ou piora da solucao
+    int qtdSatisfeitas = 0; // var contadora de clausulas satisfeitas
+    int var1, var2, var3;
+    int var1neg = 0; var2neg = 0; var3neg = 0;
 
-    /* ... */
+    // pega candidato_sol e ve quantas clausulas ele satisfaz
+        // se for melhor do que qtdAnteriorSat
+            // qtdAnteriorSat = qtdSatisfeitas;
+            // return 1;
+        //else
+            // return 0;
+            
+    // 3-CNF -> (A && B && C) || (D && E && F)
+    for(n = 0; n < tam; n += 3){
+        var1 = vet[n];
+        var2 = vet[n+1];
+        var3 = vet[n+2];
+        
+        if(negs[n] == 1)
+            var1neg = 1;
+        if(negs[n+1] == 1)
+            var2neg = 1;
+        if(negs[n+2] == 1)
+            var3neg = 1;
+    } 
 
-    if(melhor)
-        return 1;
-    else
-        return 0;
 }
 
-int resfriamento(int i){
+int resfriamento(int i, int temp){
     int novaTemp;           // nova temperatura que o sistema adquire apos interação
 
-    if(i > TN){             // se ainda nao alcancou a temperatura final TN
-        /* ... */
+    if(temp > TN){             // se ainda nao alcancou a temperatura final TN
+        
+        /* Fórmula de resfriamento linear */
+        novaTemp = T0 - i * ((T0 - TN) / N);
 
         return novaTemp;
     }else{
-        return 0;           // temperatura final atingida
+        return -1;           // temperatura final atingida
     }
 }
 
