@@ -16,7 +16,7 @@
     cada instancia
 
     TODO:
-        zeros perdidos no vetor final?
+        por que as 250 primeiras posicoes do vetor final[] sao lixo?
 
     gcc -o sat_sa sat_sa.c -lm
 */
@@ -53,7 +53,7 @@ void gera_solucao_inicial();
 float resfriamento(int i);                
 int avalia_solucao();			// fitness
 void perturba();				// crossover
-void avalia_print(int j);
+void avalia_print();
 void salva_final();             // salvar no txt
 
 
@@ -64,7 +64,7 @@ int negs[3 * QTDCLAUS];
 int solucao[QTDVARS];
 int candidato_sol[QTDVARS];
 int qtdAnterior = 0;
-int final[N];   // vetor de qtdSatisfeitas a cada iteração
+int final[N], qtdFinal = 0;     // vetor de qtdSatisfeitas a cada iteração
 float delta;
 
 
@@ -73,6 +73,9 @@ int main(){
     float temperatura = T0;
     float chance, exp;
     clock_t t;
+
+    for(j = 0; j < N; j++)
+        final[j] = 0;
 
     srand((unsigned)time(NULL));
     
@@ -142,22 +145,20 @@ void monta_vetores(){
         printf("ERRO AO LER ARQUIVO!\n");
     }else{
         fscanf(f, "%d", &qtdVars);
-        fscanf(f, "%d", &qtdClaus); 
-
-        for(i = 0; i < QTDVARS; i++)        // inicia o vetor de negacao
-            negs[i] = 0;   
+        fscanf(f, "%d", &qtdClaus);  
 
         for(i = 0; i < tam; i++){
 
             if(ignore == 3){
-                fscanf(f, "%d", &ignore); 
-                //printf("%d\n", ignore);
+                fscanf(f, "%d", &ignore);   // ignorar o 0 no final de cada clausula
             }
 
             fscanf(f, "%d", &vet[i]);       // le a var na posicao i
 
             if(vet[i] < 0){
                 negs[i] = 1;                // se for negação        
+            }else{
+                negs[i] = 0;
             }
 
             vet[i] = abs(vet[i]);           // armazena apenas a variavel no vetor vet, e nao se está negada ou nao
@@ -165,7 +166,7 @@ void monta_vetores(){
 
             ignore++;
 
-            printf("%d\n", vet[i]);
+            //printf("%d\n", negs[i]);
         }
     }
 }
@@ -174,7 +175,7 @@ void monta_vetores(){
 void gera_solucao_inicial(){
     int chance, i;
     
-    for(i = 0; i < tam; i++){
+    for(i = 0; i < QTDVARS; i++){
         chance = rand() % 100; 
         
         if(chance < 50){
@@ -244,8 +245,9 @@ int avalia_solucao(){
                 var3 = 1;
         }
         
-        if(var1 || var2 || var3)
+        if(var1 || var2 || var3){
             qtdSatisfeitas++;
+        }    
     }
 
     delta = (float)(qtdSatisfeitas - qtdAnterior);
@@ -261,11 +263,13 @@ int avalia_solucao(){
 }
 
 
-void avalia_print(int i){
+void avalia_print(){
     /* Funcao utilziada para imprimir a quantidade
        de clausulas satisfeitas pela solucao escolhida */
 
-    int var1, var2, var3, qtdSatisfeitas = 0, n;
+    int var1, var2, var3;
+    int qtdSatisfeitas = 0;
+    int n, i = 0;
             
     // 3-CNF -> (A || B || C) && (D || E || F) && ...
     for(n = 0; n < tam; n += 3){
@@ -296,8 +300,13 @@ void avalia_print(int i){
             qtdSatisfeitas++;
     }
     
-    final[i] = qtdSatisfeitas;
-    //printf("%d\n", qtdSatisfeitas);
+    while(final[i] != 0 && i < N){  // procura o final do vetor final[]
+        i++;
+    }
+
+    final[qtdFinal] = qtdSatisfeitas;
+    printf("%d %d %d\n", qtdSatisfeitas, final[qtdFinal], qtdFinal);
+    qtdFinal++;
 }
 
 
@@ -308,10 +317,7 @@ float resfriamento(int i){
     novaTemp = T0 - (float)i * ((T0 - TN) / (float)N);
 
     /* Fórmula de resfriamento n5 */
-    //novaTemp = ((T0 - TN)/(1.0 + pow(2.7, 3.0*((float)i - ((float)N)/2.0))));
-
-    /* busca aleatoria */
-    //novaTemp = 100.0;
+    //novaTemp = ((T0 - TN)/(1.0 + pow(2.7, 0.3*((float)i - ((float)N)/2.0))));
 
     //printf("%f\n", novaTemp);
         
@@ -323,7 +329,8 @@ void salva_final(){
     FILE *escreve = fopen("resultados.txt", "w+");
     int j;
 
-    for(j = 0; j < N; j++){
+    for(j = 0; j < qtdFinal; j++){
+        printf("%d\n", final[j]);
         fprintf(escreve, "%d\n", final[j]);
     }
 }
