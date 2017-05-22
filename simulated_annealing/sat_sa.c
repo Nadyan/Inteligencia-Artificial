@@ -5,17 +5,28 @@
     Utilizando Simulated Annealing para
     resolver o problema 3-SAT
 
-    Na análise, verificar se o algoritmo convergiu,
+    É algoritmo de melhoria, diferente do de construção
+
+    -> Na análise, verificar se o algoritmo convergiu,
     ou seja, o espaço de busca se afunila com o tempo,
     diferente da busca aleatoria
 
+    -> Executar 10 vezes para cada instancia, tirar um grafico de media
+    para cada, resultando em um grafico de convergencia para 
+    cada instancia
+
+    TODO:
+        zeros perdidos no vetor final?
+
     gcc -o sat_sa sat_sa.c -lm
 */
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+
 
 /* Defines */
 #define T0                  4.0          // Temperatura inicial
@@ -35,13 +46,16 @@
 //#define QTDVARS           250
 //#define QTDCLAUS          1065
 
+
 /* Funcoes */
 void monta_vetores();
 void gera_solucao_inicial();
 float resfriamento(int i);                
 int avalia_solucao();			// fitness
 void perturba();				// crossover
-void avalia_print();
+void avalia_print(int j);
+void salva_final();             // salvar no txt
+
 
 /* Vars */
 int tam = 3 * QTDCLAUS;
@@ -50,24 +64,27 @@ int negs[3 * QTDCLAUS];
 int solucao[QTDVARS];
 int candidato_sol[QTDVARS];
 int qtdAnterior = 0;
+int final[N];   // vetor de qtdSatisfeitas a cada iteração
 float delta;
 
+
 int main(){
-    int j, k, aux, oi = 0, oi2 = 0;
+    int j, k, aux, pioras = 0, melhoras = 0;
     float temperatura = T0;
     float chance, exp;
+    clock_t t;
 
     srand((unsigned)time(NULL));
     
     monta_vetores();
     gera_solucao_inicial();
 
+    t = clock();
     for(j = 0; j < N; j++){
       
         aux = avalia_solucao();                 // avalia a solucao contida no candidato_sol[]
         //printf("%d\n", aux);
 
-              
         if(aux == 0){                     // se a solucao canditada for pior
             
             chance = ((float)rand()/(float)(RAND_MAX)) * 100; // gera um float aleatorio
@@ -82,29 +99,35 @@ int main(){
                 for(k = 0; k < tam; k++)
                     solucao[k] = candidato_sol[k];
 
-                oi++;
-                //avalia_print();
+                pioras++;
+                avalia_print(j);
             }
         }else if(aux == 1){                           // se a solucao candidata for melhor
             for(k = 0; k < tam; k++)
                 solucao[k] = candidato_sol[k];  // atribui como solucao
 
-            oi2++;
-            //avalia_print();
+            melhoras++;
+            avalia_print(j);
         }
-
+        
         perturba();
         temperatura = resfriamento(j);
     }
+    t = clock() - t;
+    double time_taken = ((double)t)/CLOCKS_PER_SEC;
 
-    printf("piorias: %d\nmelhorias: %d\n", oi, oi2);    
+    printf("Tempo de execução: %lf\n", time_taken);
+
+    printf("pioras: %d\nmelhoras: %d\n", pioras, melhoras);   
+
+    salva_final(); 
 
     return 0;
 }
 
+
 void monta_vetores(){
-    
-    int ignore;
+    int ignore = 0;
 
     /* instancia 1 */
     FILE *f = fopen("instancias/uf20_01.txt", "r");
@@ -125,6 +148,12 @@ void monta_vetores(){
             negs[i] = 0;   
 
         for(i = 0; i < tam; i++){
+
+            if(ignore == 3){
+                fscanf(f, "%d", &ignore); 
+                //printf("%d\n", ignore);
+            }
+
             fscanf(f, "%d", &vet[i]);       // le a var na posicao i
 
             if(vet[i] < 0){
@@ -136,13 +165,11 @@ void monta_vetores(){
 
             ignore++;
 
-            if(ignore == 3){
-                fscanf(f, "%d", &ignore); 
-                //printf("%d\n", ignore);
-            }
+            printf("%d\n", vet[i]);
         }
     }
 }
+
 
 void gera_solucao_inicial(){
     int chance, i;
@@ -159,6 +186,7 @@ void gera_solucao_inicial(){
         }
     }
 }
+
 
 void perturba(){
     int chance, i;
@@ -185,6 +213,7 @@ void perturba(){
         candidato_sol[chance] = 0;
     
 }
+
 
 int avalia_solucao(){
     int qtdSatisfeitas = 0, n, aux; // var contadora de clausulas satisfeitas
@@ -218,8 +247,6 @@ int avalia_solucao(){
         if(var1 || var2 || var3)
             qtdSatisfeitas++;
     }
-    
-    //printf("%d\n", qtdSatisfeitas);
 
     delta = (float)(qtdSatisfeitas - qtdAnterior);
 
@@ -233,13 +260,12 @@ int avalia_solucao(){
     }
 }
 
-void avalia_print(){
+
+void avalia_print(int i){
     /* Funcao utilziada para imprimir a quantidade
        de clausulas satisfeitas pela solucao escolhida */
 
     int var1, var2, var3, qtdSatisfeitas = 0, n;
-
-    FILE *escreve = fopen("resultados.txt", "a+");
             
     // 3-CNF -> (A || B || C) && (D || E || F) && ...
     for(n = 0; n < tam; n += 3){
@@ -269,10 +295,11 @@ void avalia_print(){
         if(var1 || var2 || var3)
             qtdSatisfeitas++;
     }
-
-    fprintf(escreve, "%d\n", qtdSatisfeitas);
-    printf("%d\n", qtdSatisfeitas);
+    
+    final[i] = qtdSatisfeitas;
+    //printf("%d\n", qtdSatisfeitas);
 }
+
 
 float resfriamento(int i){
     float novaTemp;
@@ -290,5 +317,18 @@ float resfriamento(int i){
         
     return novaTemp;
 }
+
+
+void salva_final(){
+    FILE *escreve = fopen("resultados.txt", "w+");
+    int j;
+
+    for(j = 0; j < N; j++){
+        fprintf(escreve, "%d\n", final[j]);
+    }
+}
+
+
+
 
 
