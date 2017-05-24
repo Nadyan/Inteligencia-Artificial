@@ -15,9 +15,6 @@
     para cada, resultando em um grafico de convergencia para 
     cada instancia
 
-    TODO:
-        por que as 250 primeiras posicoes do vetor final[] sao lixo?
-
     gcc -o sat_sa sat_sa.c -lm
 */
 
@@ -35,16 +32,16 @@
 #define CHANCE_PERTURBACAO  3            // % de chance de bit flip da solucao
 
 /* instancia 1 */
-#define QTDVARS             20          // Quantidade de variaveis
-#define QTDCLAUS            91          // Quantidade de clausulas
+//#define QTDVARS             20          // Quantidade de variaveis
+//#define QTDCLAUS            91          // Quantidade de clausulas
 
 /* instancia 2 */
 //#define QTDVARS           100   
 //#define QTDCLAUS          430
 
 /* instancia 3 */
-//#define QTDVARS           250
-//#define QTDCLAUS          1065
+#define QTDVARS           250
+#define QTDCLAUS          1065
 
 
 /* Funcoes */
@@ -53,7 +50,7 @@ void gera_solucao_inicial();
 float resfriamento(int i);                
 int avalia_solucao();			// fitness
 void perturba();				// crossover
-void avalia_print();
+void avalia_print();            // montar vetor final[]
 void salva_final();             // salvar no txt
 
 
@@ -90,27 +87,27 @@ int main(){
 
         if(aux == 0){                     // se a solucao canditada for pior
             
-            chance = ((float)rand()/(float)(RAND_MAX)) * 100; // gera um float aleatorio
+            chance = ((float)rand()/(float)(RAND_MAX)) * 1.0; // gera um float aleatorio
             //printf("%f\n", chance);
 
             exp = delta/temperatura;
             //printf("%f\n", exp);
             
-            //printf("%f\n", (pow(2.7, exp)*100.0));
+            //printf("%f\n", (pow(2.7, exp))*1.0);
 
-            if(chance < (pow(2.7, exp)*100.0)){
-                for(k = 0; k < tam; k++)
+            if(chance < (pow(2.718281, exp)*1.0)){
+                for(k = 0; k < QTDVARS; k++)
                     solucao[k] = candidato_sol[k];
 
                 pioras++;
-                avalia_print(j);
+                avalia_print();
             }
         }else if(aux == 1){                           // se a solucao candidata for melhor
-            for(k = 0; k < tam; k++)
+            for(k = 0; k < QTDVARS; k++)
                 solucao[k] = candidato_sol[k];  // atribui como solucao
 
             melhoras++;
-            avalia_print(j);
+            avalia_print();
         }
         
         perturba();
@@ -133,11 +130,11 @@ void monta_vetores(){
     int ignore = 0;
 
     /* instancia 1 */
-    FILE *f = fopen("instancias/uf20_01.txt", "r");
+    //FILE *f = fopen("instancias/uf20_01.txt", "r");
     /* instancia 2 */
     //FILE *f = fopen("instancias/uf100_01.txt", "r");
     /* instancia 3 */       
-    //FILE *f = fopen("isntancias/uf250_01.txt", "r");
+    FILE *f = fopen("instancias/uf250_01.txt", "r");
     
     int i, qtdVars, qtdClaus;
 
@@ -222,9 +219,9 @@ int avalia_solucao(){
             
     // 3-CNF -> (A || B || C) && (D || E || F) && ...
     for(n = 0; n < tam; n += 3){
-        var1 = candidato_sol[vet[n]];
-        var2 = candidato_sol[vet[n+1]];
-        var3 = candidato_sol[vet[n+2]];
+        var1 = candidato_sol[vet[n]-1];
+        var2 = candidato_sol[vet[n+1]-1];
+        var3 = candidato_sol[vet[n+2]-1];
         
         if(negs[n] == 1){
             if(var1 == 1)
@@ -269,13 +266,13 @@ void avalia_print(){
 
     int var1, var2, var3;
     int qtdSatisfeitas = 0;
-    int n, i = 0;
+    int n;
             
     // 3-CNF -> (A || B || C) && (D || E || F) && ...
     for(n = 0; n < tam; n += 3){
-        var1 = solucao[vet[n]];
-        var2 = solucao[vet[n+1]];
-        var3 = solucao[vet[n+2]];
+        var1 = solucao[vet[n]-1];
+        var2 = solucao[vet[n+1]-1];
+        var3 = solucao[vet[n+2]-1];
         
         if(negs[n] == 1){
             if(var1 == 1)
@@ -299,13 +296,9 @@ void avalia_print(){
         if(var1 || var2 || var3)
             qtdSatisfeitas++;
     }
-    
-    while(final[i] != 0 && i < N){  // procura o final do vetor final[]
-        i++;
-    }
 
     final[qtdFinal] = qtdSatisfeitas;
-    printf("%d %d %d\n", qtdSatisfeitas, final[qtdFinal], qtdFinal);
+    //printf("%d %d %d\n", qtdFinal, qtdSatisfeitas, final[qtdFinal]);
     qtdFinal++;
 }
 
@@ -313,13 +306,16 @@ void avalia_print(){
 float resfriamento(int i){
     float novaTemp;
         
-    /* Fórmula de resfriamento linear */
-    novaTemp = T0 - (float)i * ((T0 - TN) / (float)N);
+    /* Fórmula de resfriamento n1 */
+    //novaTemp = T0 - (float)i * ((T0 - TN) / (float)N);
+
+    /* Fórmula de resfriamento n4 */
+    //novaTemp = ((T0 - TN)/(1.0 + pow(2.7, 3*((float)i - ((float)N)/2.0))));
 
     /* Fórmula de resfriamento n5 */
-    //novaTemp = ((T0 - TN)/(1.0 + pow(2.7, 0.3*((float)i - ((float)N)/2.0))));
+    novaTemp = (0.5 * (T0 - TN)) * (1.0 + cos(((float)i * 3.141592) / (float)N)) + TN;
 
-    //printf("%f\n", novaTemp);
+    printf("%f\n", novaTemp);
         
     return novaTemp;
 }
@@ -330,12 +326,10 @@ void salva_final(){
     int j;
 
     for(j = 0; j < qtdFinal; j++){
-        printf("%d\n", final[j]);
+        //printf("%d\n", final[j]);
         fprintf(escreve, "%d\n", final[j]);
     }
 }
-
-
 
 
 
