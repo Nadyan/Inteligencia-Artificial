@@ -1,0 +1,14 @@
+TO DO:
+
+[X] Vetores de ferramentas da capacidade e de fabricas consertadas;
+[X] Função de ler cenario do txt e montar vetores do cenario;
+[X] Montar parte do A*;
+[ ] Montar movimentação do agente;
+[ ] Montar cenário com ferramentas e fabricas aleatoriamente;
+[ ] Decisões; 
+
+
+
+BUGS:
+
+[ ] -
